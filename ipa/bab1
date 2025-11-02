@@ -1,1 +1,305 @@
-IPA BAB 1
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materi Sub Bab</title>
+    <!-- Memuat Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Menggunakan font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        /* Style untuk format teks materi */
+        .prose {
+            line-height: 1.7;
+        }
+        .prose ul, .prose ol {
+            padding-left: 1.5rem;
+        }
+        .prose ul > li {
+            list-style-type: disc;
+            margin-top: 0.5rem;
+        }
+        .prose ol > li {
+            list-style-type: decimal;
+            margin-top: 0.5rem;
+        }
+        .prose p {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .prose code {
+            background-color: #f3f4f6; /* bg-gray-100 */
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem; /* rounded-md */
+            font-family: monospace;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="container mx-auto px-4 py-8 md:py-12">
+        <!-- Tombol Kembali -->
+        <div class="mb-8">
+            <!-- Tombol ini akan kembali ke menu utama -->
+            <a href="index.html" class="inline-flex items-center text-gray-700 font-medium text-lg hover:text-blue-600 transition-colors duration-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Kembali ke Menu Utama
+            </a>
+        </div>
+        
+        <!-- Header Sub Bab (Ganti Isinya) -->
+        <header class="text-left mb-10">
+            <p class="text-lg font-semibold text-blue-600">Bab 1: Bilangan Bulat</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800">
+                1.1 Operasi Hitung Campuran
+            </h1>
+        </header>
+
+        <main>
+            <!-- Navigasi Menu Konten (BARU) -->
+            <nav class="flex flex-wrap gap-3 mb-8">
+                <button id="btn-infografis" onclick="showContent('content-infografis', this)" class="nav-button">
+                    Infografis
+                </button>
+                <button id="btn-ringkasan" onclick="showContent('content-ringkasan', this)" class="nav-button">
+                    Ringkasan Materi
+                </button>
+                <button id="btn-audio" onclick="showContent('content-audio', this)" class="nav-button">
+                    Materi Audio
+                </button>
+                <button id="btn-video" onclick="showContent('content-video', this)" class="nav-button">
+                    Video
+                </button>
+                <button id="btn-quiz" onclick="showContent('content-quiz', this)" class="nav-button">
+                    Quiz Interaktif
+                </button>
+            </nav>
+
+            <!-- Area Konten Dinamis -->
+
+            <!-- 1. Konten Infografis -->
+            <div id="content-infografis" class="content-section">
+                <section class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Infografis</h2>
+                    <div class="bg-gray-200 rounded-lg overflow-hidden border">
+                        <img src="https://placehold.co/800x450/3B82F6/FFFFFF?text=Infografis:+Ka-Ba-Ta-Ku&font=inter" alt="Infografis Operasi Hitung Campuran" class="w-full h-auto">
+                    </div>
+                </section>
+            </div>
+
+            <!-- 2. Konten Ringkasan Materi -->
+            <div id="content-ringkasan" class="content-section hidden">
+                <section class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Ringkasan Materi</h2>
+                    <div class="prose max-w-none text-gray-700 text-base">
+                        <p>Operasi hitung campuran adalah soal yang melibatkan lebih dari satu jenis operasi hitung (tambah, kurang, kali, bagi).</p>
+                        <p>Untuk mengerjakannya, kita harus mengikuti aturan <strong>"Ka-Ba-Ta-Ku"</strong>:</p>
+                        <ul>
+                            <li><strong>Ka</strong>: Kerjakan yang di dalam <strong>Kurung</strong> () terlebih dahulu.</li>
+                            <li><strong>Ba</strong>: Kerjakan <strong>Kali</strong> (x) dan <strong>Bagi</strong> (:) setelahnya. Keduanya sama kuat, kerjakan dari kiri ke kanan.</li>
+                            <li><strong>Ta</strong>: Kerjakan <strong>Tambah</strong> (+) dan <strong>Kurang</strong> (-) paling akhir. Keduanya juga sama kuat, kerjakan dari kiri ke kanan.</li>
+                        </ul>
+                        <p class="font-semibold mt-4">Contoh:</p>
+                        <p><code>5 + ( 10 - 2 ) x 3 = ...</code></p>
+                        <ol>
+                            <li>Kerjakan dalam kurung: (10 - 2) = 8</li>
+                            <li>Soal menjadi: <code>5 + 8 x 3</code></li>
+                            <li>Kerjakan perkalian: 8 x 3 = 24</li>
+                            <li>Soal menjadi: <code>5 + 24</code></li>
+                            <li>Kerjakan penjumlahan: 5 + 24 = 29</li>
+                        </ol>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 3. Konten Materi Audio -->
+            <div id="content-audio" class="content-section hidden">
+                <section class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Materi Audio</h2>
+                    <p class="text-sm text-gray-600 mb-3">Dengarkan ringkasan materi ini dalam bentuk audio.</p>
+                    <audio controls class="w-full">
+                        <!-- PERBAIKAN: src="" diganti menjadi src="#" untuk menghindari eror 404 -->
+                        <source src="#" type="audio/mpeg">
+                        Browser Anda tidak mendukung elemen audio.
+                    </audio>
+                    <small class="text-xs text-gray-500 mt-2 block">Anda perlu menambahkan file audio sendiri pada bagian 'src'.</small>
+                </section>
+            </div>
+
+            <!-- 4. Konten Video Pembelajaran -->
+            <div id="content-video" class="content-section hidden">
+                <section class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Video Pembelajaran</h2>
+                    <p class="text-sm text-gray-600 mb-3">Tonton video di bawah ini untuk penjelasan lebih lanjut.</p>
+                    <div class="relative" style="padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%;">
+                        <iframe class="absolute top-0 left-0 w-full h-full rounded-lg"
+                                src="https://www.youtube.com/embed/VIDEO_ID_HERE" 
+                                title="YouTube video player" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                    <small class="text-xs text-gray-500 mt-2 block">Ganti 'VIDEO_ID_HERE' di dalam 'src' dengan ID video YouTube.</small>
+                </section>
+            </div>
+
+            <!-- 5. Konten Quiz Interaktif -->
+            <div id="content-quiz" class="content-section hidden">
+                <section class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Quiz Interaktif</h2>
+                    <div id="quiz-container" class="space-y-6">
+                        <!-- Pertanyaan 1 -->
+                        <div class="quiz-question">
+                            <p class="font-semibold text-lg mb-3">1. Pada soal <code>10 + 5 x (3 - 1)</code>, operasi apa yang harus dikerjakan pertama kali?</p>
+                            <div class="space-y-2">
+                                <label class="block p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
+                                    <input type="radio" name="q1" value="a" class="mr-2"> Penjumlahan (10 + 5)
+                                </label>
+                                <label class="block p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
+                                    <input type="radio" name="q1" value="b" class="mr-2"> Perkalian (5 x 3)
+                                </label>
+                                <label class="block p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
+                                    <input type="radio" name="q1" value="c" class="mr-2"> Pengurangan di dalam kurung (3 - 1)
+                                </label>
+                            </div>
+                        </div>
+                        <!-- Pertanyaan 2 -->
+                        <div class="quiz-question">
+                            <p class="font-semibold text-lg mb-3">2. Berapa hasil dari <code>20 : 2 x 5</code> ?</p>
+                            <div class="space-y-2">
+                                <label class="block p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
+                                    <input type="radio" name="q2" value="a" class="mr-2"> 2 (karena 2 x 5 = 10, lalu 20 : 10 = 2)
+                                </label>
+                                <label class="block p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
+                                    <input type="radio" name="q2" value="b" class="mr-2"> 50 (karena 20 : 2 = 10, lalu 10 x 5 = 50)
+                                </label>
+                            </div>
+                        </div>
+                        <!-- Tombol Cek -->
+                        <button onclick="cekKuis()" class="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition-all duration-200">
+                            Cek Jawaban
+                        </button>
+                        <!-- Feedback -->
+                        <div id="quiz-feedback" class="mt-4 p-4 rounded-lg hidden"></div>
+                    </div>
+                </section>
+            </div>
+            
+        </main>
+    </div>
+
+    <!-- Script untuk Navigasi Konten dan Kuis -->
+    <script>
+        // --- SCRIPT NAVIGASI KONTEN (BARU) ---
+        
+        // Definisikan style untuk tombol
+        const baseButtonClasses = 'px-5 py-2 rounded-lg font-semibold bg-white text-gray-700 border-2 border-gray-200 hover:bg-gray-100 transition-all';
+        const activeButtonClasses = 'px-5 py-2 rounded-lg font-semibold bg-blue-600 text-white shadow-lg border-2 border-blue-600';
+
+        // Fungsi untuk pindah konten
+        function showContent(contentId, clickedButton) {
+            // 1. Sembunyikan semua .content-section
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // 2. Tampilkan section yang dituju
+            const activeSection = document.getElementById(contentId);
+            if (activeSection) {
+                activeSection.classList.remove('hidden');
+            }
+
+            // 3. Reset semua style tombol .nav-button
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.className = `nav-button ${baseButtonClasses}`;
+            });
+
+            // 4. Set style tombol yang aktif
+            if (clickedButton) {
+                clickedButton.className = `nav-button ${activeButtonClasses}`;
+            }
+        }
+
+        // Set state awal saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tampilkan konten pertama (Infografis) dan buat tombolnya aktif
+            const firstButton = document.getElementById('btn-infografis');
+            showContent('content-infografis', firstButton);
+        });
+
+
+        // --- SCRIPT KUIS INTERAKTIF (TETAP SAMA) ---
+        function cekKuis() {
+            const answers = {
+                q1: 'c',
+                q2: 'b'
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            const feedbackEl = document.getElementById('quiz-feedback');
+            const quizContainer = document.getElementById('quiz-container');
+            const questions = quizContainer.querySelectorAll('.quiz-question');
+
+            // Reset style
+            questions.forEach((q, index) => {
+                const qName = `q${index + 1}`;
+                const labels = q.querySelectorAll('label');
+                labels.forEach(label => {
+                    label.classList.remove('bg-red-100', 'border-red-400', 'bg-green-100', 'border-green-400');
+                    label.classList.add('border-gray-200');
+                });
+            });
+
+            // Cek jawaban
+            const selectedQ1 = quizContainer.querySelector('input[name="q1"]:checked');
+            const selectedQ2 = quizContainer.querySelector('input[name="q2"]:checked');
+
+            // Cek Pertanyaan 1
+            if (selectedQ1) {
+                const parentLabel = selectedQ1.closest('label');
+                if (selectedQ1.value === answers.q1) {
+                    score++;
+                    parentLabel.classList.add('bg-green-100', 'border-green-400');
+                } else {
+                    parentLabel.classList.add('bg-red-100', 'border-red-400');
+                }
+            }
+            
+            // Cek Pertanyaan 2
+            if (selectedQ2) {
+                const parentLabel = selectedQ2.closest('label');
+                if (selectedQ2.value === answers.q2) {
+                    score++;
+                    parentLabel.classList.add('bg-green-100', 'border-green-400');
+                } else {
+                    parentLabel.classList.add('bg-red-100', 'border-red-400');
+                }
+            }
+
+            // Tampilkan feedback
+            if (feedbackEl) {
+                feedbackEl.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-green-100', 'text-green-800');
+                if (score === totalQuestions) {
+                    feedbackEl.innerHTML = `<strong>Hebat! (Skor: ${score}/${totalQuestions})</strong> Semua jawabanmu benar!`;
+                    feedbackEl.classList.add('bg-green-100', 'text-green-800');
+                } else {
+                    feedbackEl.innerHTML = `<strong>(Skor: ${score}/${totalQuestions})</strong> Kamu masih ada yang salah. Coba periksa lagi jawaban yang berwarna merah.`;
+                    feedbackEl.classList.add('bg-red-100', 'text-red-800');
+                }
+                feedbackEl.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
