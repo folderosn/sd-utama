@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zona Juara Kelas 6</title>
+    <!-- 1. Memuat Tailwind CSS untuk styling modern -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 2. Memuat Google Font (Nunito) yang ramah dan modern -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- 3. Konfigurasi Tailwind & CSS Kustom -->
+    <style>
+        /* Mengatur font default ke Nunito */
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8fafc; /* Latar belakang abu-abu sangat muda */
+        }
+        
+        /* Efek transisi untuk kartu mata pelajaran */
+        .subject-card {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Efek hover: kartu terangkat dan bersinar */
+        .subject-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Menyembunyikan konten mata pelajaran secara default */
+        .subject-content-section {
+            display: none;
+        }
+        
+        /* Menyembunyikan modal secara default */
+        .modal {
+            display: none;
+        }
+        
+        /* Style untuk accordion (Bab) */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        
+        /* Style untuk sub-bab yang terkunci */
+        .sub-bab-item.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #f1f5f9; /* bg-slate-100 */
+        }
+        
+        /* Style untuk sub-bab yang terbuka */
+        .sub-bab-item.unlocked:hover {
+            background-color: #e0f2fe; /* bg-sky-100 */
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- ===== HEADER / NAVIGASI ===== -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-3xl font-extrabold text-blue-600">
+                Zona Juara 6 🚀
+            </div>
+            <!-- Profil Siswa (Mockup) -->
+            <div class="flex items-center space-x-3">
+                <span class="font-semibold text-gray-700 hidden sm:block">Halo, Siswa Hebat!</span>
+                <img src="https://placehold.co/40x40/60A5FA/FFF?text=S" alt="Avatar Siswa" class="w-10 h-10 rounded-full border-2 border-blue-500">
+                <span class="font-bold text-yellow-500 bg-yellow-100 px-3 py-1 rounded-full text-sm">🌟 120 Poin</span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ===== KONTEN UTAMA ===== -->
+    <main class="container mx-auto p-6 md:p-10">
+
+        <!-- ===== 1. HALAMAN UTAMA (GRID MATA PELAJARAN) ===== -->
+        <section id="main-grid" class="text-center">
+            <h1 class="text-4xl font-extrabold mb-3 text-gray-900">Selamat Datang, Penjelajah Ilmu!</h1>
+            <p class="text-xl text-gray-600 mb-10">Pilih arena belajarmu di bawah ini untuk memulai petualangan.</p>
+
+            <!-- Grid 6 Mata Pelajaran -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+
+                <!-- Kartu 1: Matematika -->
+                <div data-subject="matematika" class="subject-card cursor-pointer bg-gradient-to-br from-blue-100 to-blue-200 p-8 rounded-2xl shadow-lg border-b-4 border-blue-400">
+                    <div class="text-6xl mb-4">🧠</div>
+                    <h3 class="text-3xl font-bold text-blue-800 mb-2">Matematika</h3>
+                    <p class="text-blue-700">Taklukkan tantangan di Pulau Logika!</p>
+                </div>
+
+                <!-- Kartu 2: Bahasa Indonesia -->
+                <div data-subject="bahasa-indonesia" class="subject-card cursor-pointer bg-gradient-to-br from-green-100 to-green-200 p-8 rounded-2xl shadow-lg border-b-4 border-green-400">
+                    <div class="text-6xl mb-4">📖</div>
+                    <h3 class="text-3xl font-bold text-green-800 mb-2">Bahasa Indonesia</h3>
+                    <p class="text-green-700">Jelajahi keindahan Pulau Sastra.</p>
+                </div>
+
+                <!-- Kartu 3: Bahasa Inggris -->
+                <div data-subject="bahasa-inggris" class="subject-card cursor-pointer bg-gradient-to-br from-purple-100 to-purple-200 p-8 rounded-2xl shadow-lg border-b-4 border-purple-400">
+                    <div class="text-6xl mb-4">🇬🇧</div>
+                    <h3 class="text-3xl font-bold text-purple-800 mb-2">Bahasa Inggris</h3>
+                    <p class="text-purple-700">Kuasai bahasa di Desa Global.</p>
+                </div>
+
+                <!-- Kartu 4: Pendidikan Pancasila -->
+                <div data-subject="pancasila" class="subject-card cursor-pointer bg-gradient-to-br from-red-100 to-red-200 p-8 rounded-2xl shadow-lg border-b-4 border-red-400">
+                    <div class="text-6xl mb-4">🇮🇩</div>
+                    <h3 class="text-3xl font-bold text-red-800 mb-2">Pendidikan Pancasila</h3>
+                    <p class="text-red-700">Jaga nilai luhur di Benteng Garuda.</p>
+                </div>
+
+                <!-- Kartu 5: Seni Budaya -->
+                <div data-subject="seni-budaya" class="subject-card cursor-pointer bg-gradient-to-br from-yellow-100 to-yellow-200 p-8 rounded-2xl shadow-lg border-b-4 border-yellow-400">
+                    <div class="text-6xl mb-4">🎨</div>
+                    <h3 class="text-3xl font-bold text-yellow-800 mb-2">Seni Budaya</h3>
+                    <p class="text-yellow-700">Ekspresikan dirimu di Galeri Kreasi.</p>
+                </div>
+
+                <!-- Kartu 6: Projek IPAS -->
+                <div data-subject="ipas" class="subject-card cursor-pointer bg-gradient-to-br from-teal-100 to-teal-200 p-8 rounded-2xl shadow-lg border-b-4 border-teal-400">
+                    <div class="text-6xl mb-4">🔬</div>
+                    <h3 class="text-3xl font-bold text-teal-800 mb-2">Projek IPAS</h3>
+                    <p class="text-teal-700">Selidiki rahasia di Laboratorium Alam.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ===== 2. HALAMAN KONTEN MATA PELAJARAN (Tersembunyi) ===== -->
+        <section id="content-area" class="subject-content-section bg-white p-6 md:p-10 rounded-2xl shadow-xl">
+            
+            <!-- Header Halaman Konten -->
+            <div class="flex justify-between items-center mb-8 border-b-2 pb-4">
+                <h2 id="content-title" class="text-4xl font-extrabold text-gray-900">Nama Mata Pelajaran</h2>
+                <button id="back-button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-full transition-colors">
+                    &larr; Kembali
+                </button>
+            </div>
+            
+            <!-- Kontainer untuk setiap mata pelajaran -->
+            <div class="space-y-6">
+
+                <!-- Konten Matematika -->
+                <div id="content-matematika" class="subject-content">
+                    <div class="accordion-item bg-gray-50 rounded-lg shadow-sm mb-4">
+                        <h4 class="accordion-header cursor-pointer flex justify-between items-center p-5 font-bold text-xl text-blue-800 bg-blue-100 rounded-t-lg">
+                            Bab 1: Bilangan Bulat
+                            <span class="text-2xl transform transition-transform duration-300">+</span>
+                        </h4>
+                        <div class="accordion-content">
+                            <ul class="p-5 space-y-3">
+                                <li class="sub-bab-item unlocked p-4 rounded-lg font-semibold cursor-pointer border border-blue-200">📖 Sub Bab 1.1: Pengenalan Bilangan Bulat</li>
+                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.2: Operasi Penjumlahan & Pengurangan</li>
+                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.3: Operasi Perkalian & Pembagian</li>
+                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.4: Latihan Soal Cerita</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-gray-50 rounded-lg shadow-sm mb-4">
+                        <h4 class="accordion-header cursor-pointer flex justify-between items-center p-5 font-bold text-xl text-blue-800 bg-blue-100 rounded-t-lg">
+                            Bab 2: Lingkaran
+                            <span class="text-2xl transform transition-transform duration-300">+</span>
+                        </h4>
+                        <div class="accordion-content">
+                            <ul class="p-5 space-y-3">
+                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 2.1: Mengenal Unsur-unsur Lingkaran</li>
+                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 2.2: Menghitung Keliling Lingkaran</li>
+                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 2.3: Menghitung Luas Lingkaran</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Konten Bahasa Indonesia -->
+                <div id="content-bahasa-indonesia" class="subject-content">
+                    <div class="accordion-item bg-gray-50 rounded-lg shadow-sm mb-4">
+                        <h4 class="accordion-header cursor-pointer flex justify-between items-center p-5 font-bold text-xl text-green-800 bg-green-100 rounded-t-lg">
+                            Bab 1: Teks Laporan Hasil Pengamatan
+                            <span class="text-2xl transform transition-transform duration-300">+</span>
+                        </h4>
+                        <div class="accordion-content">
+                            <ul class="p-5 space-y-3">
+                                <li class="sub-bab-item unlocked p-4 rounded-lg font-semibold cursor-pointer border border-green-200">📖 Sub Bab 1.1: Ciri-ciri dan Struktur Teks Laporan</li>
+                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.2: Menemukan Ide Pokok</li>
+                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.3: Membuat Simpulan dari Teks</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-gray-50 rounded-lg shadow-sm mb-4">
+                        <h4 class="accordion-header cursor-pointer flex justify-between items-center p-5 font-bold text-xl text-green-800 bg-green-100 rounded-t-lg">
+                            Bab 2: Teks Pidato
+                            <span class="text-2xl transform transition-transform duration-300">+</span>
+                        </h4>
+                        <div class="accordion-content">
+                            <ul class="p-5 space-y-3">
+                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 2.1: Struktur Teks Pidato</li>
+                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 2.2: Kalimat Persuasif dalam Pidato</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Konten Bahasa Inggris -->
+                <div id="content-bahasa-inggris" class="subject-content">
+                     <div class="accordion-item bg-gray-50 rounded-lg shadow-sm mb-4">
+                        <h4 class="accordion-header cursor-pointer flex justify-between items-center p-5 font-bold text-xl text-purple-800 bg-purple-100 rounded-t-lg">
+                            Chapter 1: Expressions
+                            <span class="text-2xl transform transition-transform duration-300">+</span>
+                        </h4>
+                        <div class="accordion-content">
+                            <ul class="p-5 space-y-3">
+                                <li class="sub-bab-item unlocked p-4 rounded-lg font-semibold cursor-pointer border border-purple-200">📖 Sub-Chapter 1.1: Greeting and Leave-taking</li>
+                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub-Chapter 1.2: Asking and Giving Opinion</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Konten Pendidikan Pancasila -->
+                <div id="content-pancasila" class="subject-content">
+                     <div class="accordion-item bg-gray-50 rounded-lg shadow-sm mb-4">
+                        <h4 class="accordion-header cursor-pointer flex justify-between items-center p-5 font-bold text-xl text-red-800 bg-red-100 rounded-t-lg">
+                            Bab 1: Penerapan Nilai-nilai Pancasila
+                            <span class="text-2xl transform transition-transform duration-300">+</span>
+                        </h4>
+                        <div class="accordion-content">
+                            <ul class="p-5 space-y-3">
+                                <li class="sub-bab-item unlocked p-4 rounded-lg font-semibold cursor-pointer border border-red-200">📖 Sub Bab 1.1: Nilai Sila ke-1 dan ke-2</li>
+                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.2: Nilai Sila ke-3</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Konten Seni Budaya -->
+                <div id="content-seni-budaya" class="subject-content">
+                     <div class="accordion-item bg-gray-50 rounded-lg shadow-sm mb-4">
+                        <h4 class="accordion-header cursor-pointer flex justify-between items-center p-5 font-bold text-xl text-yellow-800 bg-yellow-100 rounded-t-lg">
+                            Bab 1: Seni Rupa (Reklame)
+                            <span class="text-2xl transform transition-transform duration-300">+</span>
+                        </h4>
+                        <div class="accordion-content">
+                            <ul class="p-5 space-y-3">
+                                <li class="sub-bab-item unlocked p-4 rounded-lg font-semibold cursor-pointer border border-yellow-200">📖 Sub Bab 1.1: Mengenal Reklame</li>
+                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.2: Ciri-ciri Poster yang Baik</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Konten Projek IPAS -->
+                <div id="content-ipas" class="subject-content">
+                     <div class="accordion-item bg-gray-50 rounded-lg shadow-sm mb-4">
+                        <h4 class="accordion-header cursor-pointer flex justify-between items-center p-5 font-bold text-xl text-teal-800 bg-teal-100 rounded-t-lg">
+                            Bab 1: Sistem Tata Surya
+                            <span class="text-2xl transform transition-transform duration-300">+</span>
+                        </h4>
+                        <div class="accordion-content">
+                            <ul class="p-5 space-y-3">
+                                <li class="sub-bab-item unlocked p-4 rounded-lg font-semibold cursor-pointer border border-teal-200">📖 Sub Bab 1.1: Mengenal Planet</li>
+                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.2: Rotasi dan Revolusi Bumi</li>
+                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.4: Peristiwa Gerhana</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="text-center p-10 mt-12 border-t border-gray-200">
+        <p class="text-gray-600">© 2025 Zona Juara Kelas 6 - Dibuat dengan ❤️ untuk Siswa Hebat Indonesia. Oleh Pak Salim</p>
+    </footer>
+    
+    <!-- ===== MODAL UNTUK MATERI (Tersembunyi) ===== -->
+    <div id="materi-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl p-8 transform transition-all scale-95 opacity-0" id="modal-content-inner">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-title" class="text-2xl font-bold text-blue-700">Judul Sub Bab</h3>
+                <button id="close-modal" class="text-gray-400 hover:text-gray-600 text-3xl">&times;</button>
+            </div>
+            <div id="modal-body" class="text-lg text-gray-700 space-y-4">
+                <p>Konten materi lengkap untuk <strong id="modal-materi-name"></strong> akan tampil di sini.</p>
+                <p>Ini bisa berisi video pembelajaran, rangkuman materi dalam bentuk poin-poin, atau gambar ilustrasi. Selamat belajar!</p>
+                <!-- Contoh embed video (bisa diganti) -->
+                <div class="aspect-w-16 aspect-h-9 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <p class="text-gray-500">[Video Pembelajaran Akan Tampil Di Sini]</p>
+                </div>
+            </div>
+            <div class="text-right mt-6">
+                <button id="modal-selesai" class"bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full transition-colors">
+                    Tandai Selesai 👍
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ===== JAVASCRIPT UTAMA ===== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- Variabel Elemen ---
+            const mainGrid = document.getElementById('main-grid');
+            const contentArea = document.getElementById('content-area');
+            const contentTitle = document.getElementById('content-title');
+            const backButton = document.getElementById('back-button');
+            const subjectCards = document.querySelectorAll('.subject-card');
+            const subjectContents = document.querySelectorAll('.subject-content');
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            const unlockedSubBabs = document.querySelectorAll('.sub-bab-item.unlocked');
+            
+            // Modal Elements
+            const modal = document.getElementById('materi-modal');
+            const modalContentInner = document.getElementById('modal-content-inner');
+            const closeModalButton = document.getElementById('close-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalMateriName = document.getElementById('modal-materi-name');
+            const modalSelesaiButton = document.getElementById('modal-selesai');
+
+            // --- Fungsi untuk Animasi Modal ---
+            function openModal() {
+                modal.style.display = 'flex';
+                setTimeout(() => {
+                    modalContentInner.style.transform = 'scale(1)';
+                    modalContentInner.style.opacity = '1';
+                }, 50); // Sedikit delay agar transisi CSS terbaca
+            }
+            
+            function closeModal() {
+                modalContentInner.style.transform = 'scale(0.95)';
+                modalContentInner.style.opacity = '0';
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300); // Sesuaikan dengan durasi transisi
+            }
+
+            // --- Logika 1: Klik Kartu Mata Pelajaran ---
+            subjectCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const subjectId = card.getAttribute('data-subject');
+                    const targetContent = document.getElementById('content-' + subjectId);
+                    const subjectName = card.querySelector('h3').innerText;
+
+                    // 1. Sembunyikan semua konten pelajaran
+                    subjectContents.forEach(content => content.style.display = 'none');
+                    
+                    // 2. Tampilkan konten yang sesuai
+                    if (targetContent) {
+                        targetContent.style.display = 'block';
+                        contentTitle.innerText = subjectName;
+                    }
+
+                    // 3. Tukar tampilan
+                    mainGrid.style.display = 'none';
+                    contentArea.style.display = 'block';
+                });
+            });
+
+            // --- Logika 2: Klik Tombol Kembali ---
+            backButton.addEventListener('click', () => {
+                contentArea.style.display = 'none';
+                mainGrid.style.display = 'grid'; // Kembalikan ke grid
+            });
+
+            // --- Logika 3: Accordion (Bab) ---
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('span');
+                    
+                    if (content.style.maxHeight) {
+                        // Tutup
+                        content.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        // Buka
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.style.transform = 'rotate(45deg)';
+                    }
+                });
+            });
+
+            // --- Logika 4: Klik Sub-Bab yang Terbuka ---
+            unlockedSubBabs.forEach(bab => {
+                bab.addEventListener('click', () => {
+                    const materiName = bab.innerText.replace('📖 ', ''); // Hapus emoji
+                    
+                    // Set konten modal
+                    modalTitle.innerText = materiName;
+                    modalMateriName.innerText = materiName;
+                    
+                    // Tampilkan modal
+                    openModal();
+                });
+            });
+            
+            // --- Logika 5: Menutup Modal ---
+            closeModalButton.addEventListener('click', closeModal);
+            modalSelesaiButton.addEventListener('click', closeModal);
+            
+            // Tutup modal jika klik di luar area konten
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>
