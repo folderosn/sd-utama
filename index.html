@@ -15,287 +15,412 @@
         /* Menggunakan font Inter sebagai font utama */
         body {
             font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
         }
 
         /* Warna-warni kustom untuk setiap mata pelajaran */
         .bg-matematika { background-color: #3B82F6; } /* Blue */
         .bg-matematika:hover { background-color: #2563EB; }
+        .border-matematika { border-color: #BFDBFE; }
+        .text-matematika { color: #1D4ED8; }
+        .bg-hover-matematika:hover { background-color: #DBEAFE; }
         
         .bg-indonesia { background-color: #EF4444; } /* Red */
         .bg-indonesia:hover { background-color: #DC2626; }
+        .border-indonesia { border-color: #FECACA; }
+        .text-indonesia { color: #B91C1C; }
+        .bg-hover-indonesia:hover { background-color: #FEE2E2; }
         
         .bg-inggris { background-color: #10B981; } /* Green */
         .bg-inggris:hover { background-color: #059669; }
+        .border-inggris { border-color: #A7F3D0; }
+        .text-inggris { color: #047857; }
+        .bg-hover-inggris:hover { background-color: #D1FAE5; }
         
         .bg-pancasila { background-color: #F59E0B; } /* Amber */
         .bg-pancasila:hover { background-color: #D97706; }
+        .border-pancasila { border-color: #FDE68A; }
+        .text-pancasila { color: #B45309; }
+        .bg-hover-pancasila:hover { background-color: #FEF3C7; }
         
         .bg-seni { background-color: #8B5CF6; } /* Purple */
         .bg-seni:hover { background-color: #7C3AED; }
+        .border-seni { border-color: #DDD6FE; }
+        .text-seni { color: #6D28D9; }
+        .bg-hover-seni:hover { background-color: #EBEFFF; }
         
         .bg-ipas { background-color: #06B6D4; } /* Cyan */
         .bg-ipas:hover { background-color: #0891B2; }
-
-        /* Style untuk panel accordion yang tersembunyi */
-        .subject-content {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-out, opacity 0.3s ease-out;
-        }
+        .border-ipas { border-color: #A5F3FC; }
+        .text-ipas { color: #0E7490; }
+        .bg-hover-ipas:hover { background-color: #CFFAFE; }
     </style>
 </head>
 <body class="bg-gray-100">
 
-    <div class="container mx-auto px-4 py-8 md:py-12">
-        
-        <!-- Header Utama -->
-        <header class="text-center mb-10 md:mb-16">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-2">
-                Selamat Datang, Siswa Hebat!
-            </h1>
-            <p class="text-lg md:text-xl text-gray-600">
-                Ayo jelajahi semua mata pelajaran Kelas 6 di sini.
-            </p>
-        </header>
-
-        <!-- Grid Mata Pelajaran -->
-        <main id="subject-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-
-            <!-- 1. Kartu Matematika -->
-            <div class="subject-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl">
-                <!-- Header Kartu (Tombol) -->
-                <div class="subject-header flex justify-between items-center p-6 cursor-pointer text-white bg-matematika transition-colors duration-300">
-                    <div class="flex items-center space-x-4">
-                        <!-- Ikon -->
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 14h.01M12 17h.01M15 17h.01M15 10h.01M12 10h.01M9 10h.01M4 7h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V8a1 1 0 011-1z"></path></svg>
-                        <h2 class="text-2xl font-bold">Matematika</h2>
-                    </div>
-                    <!-- Ikon Panah (untuk accordion) -->
-                    <svg class="arrow-icon w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-                <!-- Konten Tersembunyi (Bab & Sub Bab) -->
-                <div class="subject-content p-6 space-y-4">
-                    <div class="chapter-block">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Bab 1: Bilangan Bulat</h3>
-                        <ul class="list-disc list-inside ml-4 space-y-1">
-                            <li><a href="#" class="text-gray-600 hover:text-blue-600 hover:underline">1.1 Operasi Hitung Campuran</a></li>
-                            <li><a href="#" class="text-gray-600 hover:text-blue-600 hover:underline">1.2 Bilangan Bulat Negatif</a></li>
-                        </ul>
-                    </div>
-                    <div class="chapter-block">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Bab 2: Lingkaran</h3>
-                        <ul class="list-disc list-inside ml-4 space-y-1">
-                            <li><a href="#" class="text-gray-600 hover:text-blue-600 hover:underline">2.1 Unsur-unsur Lingkaran</a></li>
-                            <li><a href="#" class="text-gray-600 hover:text-blue-600 hover:underline">2.2 Keliling dan Luas Lingkaran</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. Kartu Bahasa Indonesia -->
-            <div class="subject-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl">
-                <!-- Header Kartu (Tombol) -->
-                <div class="subject-header flex justify-between items-center p-6 cursor-pointer text-white bg-indonesia transition-colors duration-300">
-                    <div class="flex items-center space-x-4">
-                        <!-- Ikon -->
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                        <h2 class="text-2xl font-bold">Bahasa Indonesia</h2>
-                    </div>
-                    <!-- Ikon Panah -->
-                    <svg class="arrow-icon w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-                <!-- Konten Tersembunyi -->
-                <div class="subject-content p-6 space-y-4">
-                    <div class="chapter-block">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Bab 1: Teks Laporan Hasil Pengamatan</h3>
-                        <ul class="list-disc list-inside ml-4 space-y-1">
-                            <li><a href="#" class="text-gray-600 hover:text-red-600 hover:underline">1.1 Ide Pokok Paragraf</a></li>
-                            <li><a href="#" class="text-gray-600 hover:text-red-600 hover:underline">1.2 Membuat Kesimpulan</a></li>
-                        </ul>
-                    </div>
-                    <div class="chapter-block">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Bab 2: Teks Pidato</h3>
-                        <ul class="list-disc list-inside ml-4 space-y-1">
-                            <li><a href="#" class="text-gray-600 hover:text-red-600 hover:underline">2.1 Kerangka Pidato</a></li>
-                            <li><a href="#" class="text-gray-600 hover:text-red-600 hover:underline">2.2 Pidato Persuasif</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. Kartu Bahasa Inggris -->
-            <div class="subject-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl">
-                <!-- Header Kartu (Tombol) -->
-                <div class="subject-header flex justify-between items-center p-6 cursor-pointer text-white bg-inggris transition-colors duration-300">
-                    <div class="flex items-center space-x-4">
-                        <!-- Ikon -->
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h10a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.7 9a3 3 0 013-3h.01a3 3 0 013 3v1.101a2 2 0 001.09 1.785l.003.001.002.001.001.001a2 2 0 011.085 1.785V14a2 2 0 01-2 2H5a2 2 0 01-2-2v-.101a2 2 0 011.085-1.785l.001-.001.002-.001.003-.001A2 2 0 005 10.101V9z"></path></svg>
-                        <h2 class="text-2xl font-bold">Bahasa Inggris</h2>
-                    </div>
-                    <!-- Ikon Panah -->
-                    <svg class="arrow-icon w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-                <!-- Konten Tersembunyi -->
-                <div class="subject-content p-6 space-y-4">
-                    <div class="chapter-block">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Chapter 1: Greetings & Introduction</h3>
-                        <ul class="list-disc list-inside ml-4 space-y-1">
-                            <li><a href="#" class="text-gray-600 hover:text-green-600 hover:underline">1.1 How to Greet People</a></li>
-                            <li><a href="#" class="text-gray-600 hover:text-green-600 hover:underline">1.2 Introducing Yourself</a></li>
-                        </ul>
-                    </div>
-                    <div class="chapter-block">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Chapter 2: My Hobby</h3>
-                        <ul class="list-disc list-inside ml-4 space-y-1">
-                            <li><a href="#" class="text-gray-600 hover:text-green-600 hover:underline">2.1 Talking About Hobbies</a></li>
-                            <li><a href="#" class="text-gray-600 hover:text-green-600 hover:underline">2.2 Simple Present Tense</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. Kartu Pendidikan Pancasila -->
-            <div class="subject-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl">
-                <!-- Header Kartu (Tombol) -->
-                <div class="subject-header flex justify-between items-center p-6 cursor-pointer text-white bg-pancasila transition-colors duration-300">
-                    <div class="flex items-center space-x-4">
-                        <!-- Ikon (Garuda/Perisai) -->
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                        <h2 class="text-2xl font-bold">Pendidikan Pancasila</h2>
-                    </div>
-                    <!-- Ikon Panah -->
-                    <svg class="arrow-icon w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-                <!-- Konten Tersembunyi -->
-                <div class="subject-content p-6 space-y-4">
-                    <div class="chapter-block">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Bab 1: Nilai-Nilai Pancasila</h3>
-                        <ul class="list-disc list-inside ml-4 space-y-1">
-                            <li><a href="#" class="text-gray-600 hover:text-amber-600 hover:underline">1.1 Pengamalan Sila Pertama</a></li>
-                            <li><a href="#" class="text-gray-600 hover:text-amber-600 hover:underline">1.2 Pengamalan Sila Kedua</a></li>
-                        </ul>
-                    </div>
-                    <div class="chapter-block">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Bab 2: Hak dan Kewajiban</h3>
-                        <ul class="list-disc list-inside ml-4 space-y-1">
-                            <li><a href="#" class="text-gray-600 hover:text-amber-600 hover:underline">2.1 Hak Anak di Rumah</a></li>
-                            <li><a href="#" class="text-gray-600 hover:text-amber-600 hover:underline">2.2 Kewajiban Siswa di Sekolah</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 5. Kartu Seni Budaya -->
-            <div class="subject-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl">
-                <!-- Header Kartu (Tombol) -->
-                <div class="subject-header flex justify-between items-center p-6 cursor-pointer text-white bg-seni transition-colors duration-300">
-                    <div class="flex items-center space-x-4">
-                        <!-- Ikon (Kuas) -->
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536l12.232-12.232z"></path></svg>
-                        <h2 class="text-2xl font-bold">Seni Budaya</h2>
-                    </div>
-                    <!-- Ikon Panah -->
-                    <svg class="arrow-icon w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-                <!-- Konten Tersembunyi -->
-                <div class="subject-content p-6 space-y-4">
-                    <div class="chapter-block">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Bab 1: Seni Rupa</h3>
-                        <ul class="list-disc list-inside ml-4 space-y-1">
-                            <li><a href="#" class="text-gray-600 hover:text-purple-600 hover:underline">1.1 Menggambar Ilustrasi</a></li>
-                            <li><a href="#" class="text-gray-600 hover:text-purple-600 hover:underline">1.2 Seni Patung Nusantara</a></li>
-                        </ul>
-                    </div>
-                    <div class="chapter-block">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Bab 2: Seni Musik</h3>
-                        <ul class="list-disc list-inside ml-4 space-y-1">
-                            <li><a href="#" class="text-gray-600 hover:text-purple-600 hover:underline">2.1 Interval Nada</a></li>
-                            <li><a href="#" class="text-gray-600 hover:text-purple-600 hover:underline">2.2 Alat Musik Daerah</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+    <!-- Kontainer untuk Halaman Menu Utama -->
+    <div id="page-menu">
+        <div class="container mx-auto px-4 py-8 md:py-12">
             
-            <!-- 6. Kartu Projek IPAS -->
-            <div class="subject-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl">
-                <!-- Header Kartu (Tombol) -->
-                <div class="subject-header flex justify-between items-center p-6 cursor-pointer text-white bg-ipas transition-colors duration-300">
-                    <div class="flex items-center space-x-4">
-                        <!-- Ikon (Sains) -->
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.97l-2.387.477a2 2 0 00-1.022.547m3.231-13.231l-2.387-.477a2 2 0 00-1.022.547l-2.387.477a6 6 0 000 7.96l2.387.477a2 2 0 001.022.547l2.387-.477a6 6 0 003.86-.97l2.387-.477a2 2 0 001.022-.547l-2.387-.477a6 6 0 000-7.96zM12 8v4l3 3"></path></svg>
-                        <h2 class="text-2xl font-bold">Projek IPAS</h2>
-                    </div>
-                    <!-- Ikon Panah -->
-                    <svg class="arrow-icon w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
-                <!-- Konten Tersembunyi -->
-                <div class="subject-content p-6 space-y-4">
-                    <div class="chapter-block">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Bab 1: Energi di Sekitar Kita</h3>
-                        <ul class="list-disc list-inside ml-4 space-y-1">
-                            <li><a href="#" class="text-gray-600 hover:text-cyan-600 hover:underline">1.1 Sumber Energi</a></li>
-                            <li><a href="#" class="text-gray-600 hover:text-cyan-600 hover:underline">1.2 Energi Alternatif</a></li>
-                        </ul>
-                    </div>
-                    <div class="chapter-block">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Bab 2: Sistem Tata Surya</h3>
-                        <ul class="list-disc list-inside ml-4 space-y-1">
-                            <li><a href="#" class="text-gray-600 hover:text-cyan-600 hover:underline">2.1 Planet-planet</a></li>
-                            <li><a href="#" class="text-gray-600 hover:text-cyan-600 hover:underline">2.2 Gerhana Matahari dan Bulan</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+            <!-- Header Utama -->
+            <header class="text-center mb-10 md:mb-16">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-2">
+                    Selamat Datang, Siswa Hebat!
+                </h1>
+                <p class="text-lg md:text-xl text-gray-600">
+                    Ayo jelajahi semua mata pelajaran Kelas 6 di sini.
+                </p>
+            </header>
 
-        </main>
-        
-        <!-- Footer -->
-        <footer class="text-center mt-12 md:mt-16 text-gray-500">
-            <p>&copy; 2025 - Dibuat untuk Siswa Kelas 6. Tetap Semangat Belajar!</p>
-        </footer>
+            <!-- Grid Mata Pelajaran -->
+            <main id="subject-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
 
+                <!-- 1. Kartu Matematika (Tombol) -->
+                <a href="#" onclick="showPage('page-matematika')" class="subject-card block bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+                    <div class="subject-header flex justify-between items-center p-6 text-white bg-matematika">
+                        <div class="flex items-center space-x-4">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 14h.01M12 17h.01M15 17h.01M15 10h.01M12 10h.01M9 10h.01M4 7h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V8a1 1 0 011-1z"></path></svg>
+                            <h2 class="text-2xl font-bold">Matematika</h2>
+                        </div>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </div>
+                </a>
+
+                <!-- 2. Kartu Bahasa Indonesia (Tombol) -->
+                <a href="#" onclick="showPage('page-indonesia')" class="subject-card block bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+                    <div class="subject-header flex justify-between items-center p-6 text-white bg-indonesia">
+                        <div class="flex items-center space-x-4">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                            <h2 class="text-2xl font-bold">Bahasa Indonesia</h2>
+                        </div>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </div>
+                </a>
+
+                <!-- 3. Kartu Bahasa Inggris (Tombol) -->
+                <a href="#" onclick="showPage('page-inggris')" class="subject-card block bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+                    <div class="subject-header flex justify-between items-center p-6 text-white bg-inggris">
+                        <div class="flex items-center space-x-4">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h10a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.7 9a3 3 0 013-3h.01a3 3 0 013 3v1.101a2 2 0 001.09 1.785l.003.001.002.001.001.001a2 2 0 011.085 1.785V14a2 2 0 01-2 2H5a2 2 0 01-2-2v-.101a2 2 0 011.085-1.785l.001-.001.002-.001.003-.001A2 2 0 005 10.101V9z"></path></svg>
+                            <h2 class="text-2xl font-bold">Bahasa Inggris</h2>
+                        </div>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </div>
+                </a>
+
+                <!-- 4. Kartu Pendidikan Pancasila (Tombol) -->
+                <a href="#" onclick="showPage('page-pancasila')" class="subject-card block bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+                    <div class="subject-header flex justify-between items-center p-6 text-white bg-pancasila">
+                        <div class="flex items-center space-x-4">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                            <h2 class="text-2xl font-bold">Pendidikan Pancasila</h2>
+                        </div>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </div>
+                </a>
+
+                <!-- 5. Kartu Seni Budaya (Tombol) -->
+                <a href="#" onclick="showPage('page-seni')" class="subject-card block bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+                    <div class="subject-header flex justify-between items-center p-6 text-white bg-seni">
+                        <div class="flex items-center space-x-4">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536l12.232-12.232z"></path></svg>
+                            <h2 class="text-2xl font-bold">Seni Budaya</h2>
+                        </div>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </div>
+                </a>
+                
+                <!-- 6. Kartu Projek IPAS (Tombol) -->
+                <a href="#" onclick="showPage('page-ipas')" class="subject-card block bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+                    <div class="subject-header flex justify-between items-center p-6 text-white bg-ipas">
+                        <div class="flex items-center space-x-4">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.97l-2.387.477a2 2 0 00-1.022.547m3.231-13.231l-2.387-.477a2 2 0 00-1.022.547l-2.387.477a6 6 0 000 7.96l2.387.477a2 2 0 001.022.547l2.387-.477a6 6 0 003.86-.97l2.387-.477a2 2 0 001.022-.547l-2.387-.477a6 6 0 000-7.96zM12 8v4l3 3"></path></svg>
+                            <h2 class="text-2xl font-bold">Projek IPAS</h2>
+                        </div>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </div>
+                </a>
+
+            </main>
+            
+            <!-- Footer -->
+            <footer class="text-center mt-12 md:mt-16 text-gray-500">
+                <p>&copy; 2025 - Dibuat untuk Siswa Kelas 6. Tetap Semangat Belajar!</p>
+            </footer>
+        </div>
     </div>
 
-    <!-- Script JavaScript untuk Accordion -->
+    <!-- 1. Halaman MATEMATIKA (Tersembunyi) -->
+    <div id="page-matematika" class="hidden">
+        <div class="container mx-auto px-4 py-8 md:py-12">
+            <!-- Tombol Kembali -->
+            <div class="mb-8">
+                <a href="#" onclick="showPage('page-menu')" class="inline-flex items-center text-gray-700 font-medium text-lg hover:text-blue-600 transition-colors duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Kembali ke Daftar Pelajaran
+                </a>
+            </div>
+            <!-- Header Pelajaran -->
+            <header class="text-left mb-10 p-8 rounded-xl shadow-lg bg-matematika text-white flex items-center space-x-6">
+                <div class="flex-shrink-0 bg-white/20 p-4 rounded-full">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 14h.01M12 17h.01M15 17h.01M15 10h.01M12 10h.01M9 10h.01M4 7h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V8a1 1 0 011-1z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-extrabold">Matematika</h1>
+                    <p class="text-lg md:text-xl text-blue-100 mt-1">Daftar Bab dan Sub Bab Pelajaran Matematika Kelas 6</p>
+                </div>
+            </header>
+            <!-- Konten Bab dan Sub Bab -->
+            <main class="bg-white p-6 md:p-8 rounded-xl shadow-lg space-y-6">
+                <!-- Bab 1 -->
+                <div class="chapter-block">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-matematika">Bab 1: Bilangan Bulat</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-blue-50 text-matematika bg-hover-matematika hover:shadow-md transition-all duration-200">1.1 Operasi Hitung Campuran</a>
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-blue-50 text-matematika bg-hover-matematika hover:shadow-md transition-all duration-200">1.2 Bilangan Bulat Negatif</a>
+                    </div>
+                </div>
+                <!-- Bab 2 -->
+                <div class="chapter-block">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-matematika">Bab 2: Lingkaran</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-blue-50 text-matematika bg-hover-matematika hover:shadow-md transition-all duration-200">2.1 Unsur-unsur Lingkaran</a>
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-blue-50 text-matematika bg-hover-matematika hover:shadow-md transition-all duration-200">2.2 Keliling dan Luas Lingkaran</a>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 2. Halaman BAHASA INDONESIA (Tersembunyi) -->
+    <div id="page-indonesia" class="hidden">
+        <div class="container mx-auto px-4 py-8 md:py-12">
+            <!-- Tombol Kembali -->
+            <div class="mb-8">
+                <a href="#" onclick="showPage('page-menu')" class="inline-flex items-center text-gray-700 font-medium text-lg hover:text-red-600 transition-colors duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Kembali ke Daftar Pelajaran
+                </a>
+            </div>
+            <!-- Header Pelajaran -->
+            <header class="text-left mb-10 p-8 rounded-xl shadow-lg bg-indonesia text-white flex items-center space-x-6">
+                <div class="flex-shrink-0 bg-white/20 p-4 rounded-full">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-extrabold">Bahasa Indonesia</h1>
+                    <p class="text-lg md:text-xl text-red-100 mt-1">Daftar Bab dan Sub Bab Pelajaran Bahasa Indonesia Kelas 6</p>
+                </div>
+            </header>
+            <!-- Konten Bab dan Sub Bab -->
+            <main class="bg-white p-6 md:p-8 rounded-xl shadow-lg space-y-6">
+                <!-- Bab 1 -->
+                <div class="chapter-block">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-indonesia">Bab 1: Teks Laporan Hasil Pengamatan</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-red-50 text-indonesia bg-hover-indonesia hover:shadow-md transition-all duration-200">1.1 Ide Pokok Paragraf</a>
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-red-50 text-indonesia bg-hover-indonesia hover:shadow-md transition-all duration-200">1.2 Membuat Kesimpulan</a>
+                    </div>
+                </div>
+                <!-- Bab 2 -->
+                <div class="chapter-block">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-indonesia">Bab 2: Teks Pidato</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-red-50 text-indonesia bg-hover-indonesia hover:shadow-md transition-all duration-200">2.1 Kerangka Pidato</a>
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-red-50 text-indonesia bg-hover-indonesia hover:shadow-md transition-all duration-200">2.2 Pidato Persuasif</a>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 3. Halaman BAHASA INGGRIS (Tersembunyi) -->
+    <div id="page-inggris" class="hidden">
+        <div class="container mx-auto px-4 py-8 md:py-12">
+            <!-- Tombol Kembali -->
+            <div class="mb-8">
+                <a href="#" onclick="showPage('page-menu')" class="inline-flex items-center text-gray-700 font-medium text-lg hover:text-green-600 transition-colors duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Kembali ke Daftar Pelajaran
+                </a>
+            </div>
+            <!-- Header Pelajaran -->
+            <header class="text-left mb-10 p-8 rounded-xl shadow-lg bg-inggris text-white flex items-center space-x-6">
+                <div class="flex-shrink-0 bg-white/20 p-4 rounded-full">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h10a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.7 9a3 3 0 013-3h.01a3 3 0 013 3v1.101a2 2 0 001.09 1.785l.003.001.002.001.001.001a2 2 0 011.085 1.785V14a2 2 0 01-2 2H5a2 2 0 01-2-2v-.101a2 2 0 011.085-1.785l.001-.001.002-.001.003-.001A2 2 0 005 10.101V9z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-extrabold">Bahasa Inggris</h1>
+                    <p class="text-lg md:text-xl text-green-100 mt-1">Daftar Chapter dan Sub Chapter Pelajaran Bahasa Inggris Kelas 6</p>
+                </div>
+            </header>
+            <!-- Konten Bab dan Sub Bab -->
+            <main class="bg-white p-6 md:p-8 rounded-xl shadow-lg space-y-6">
+                <!-- Chapter 1 -->
+                <div class="chapter-block">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-inggris">Chapter 1: Greetings & Introduction</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-green-50 text-inggris bg-hover-inggris hover:shadow-md transition-all duration-200">1.1 How to Greet People</a>
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-green-50 text-inggris bg-hover-inggris hover:shadow-md transition-all duration-200">1.2 Introducing Yourself</a>
+                    </div>
+                </div>
+                <!-- Chapter 2 -->
+                <div class="chapter-block">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-inggris">Chapter 2: My Hobby</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-green-50 text-inggris bg-hover-inggris hover:shadow-md transition-all duration-200">2.1 Talking About Hobbies</a>
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-green-50 text-inggris bg-hover-inggris hover:shadow-md transition-all duration-200">2.2 Simple Present Tense</a>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 4. Halaman PENDIDIKAN PANCASILA (Tersembunyi) -->
+    <div id="page-pancasila" class="hidden">
+        <div class="container mx-auto px-4 py-8 md:py-12">
+            <!-- Tombol Kembali -->
+            <div class="mb-8">
+                <a href="#" onclick="showPage('page-menu')" class="inline-flex items-center text-gray-700 font-medium text-lg hover:text-amber-600 transition-colors duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Kembali ke Daftar Pelajaran
+                </a>
+            </div>
+            <!-- Header Pelajaran -->
+            <header class="text-left mb-10 p-8 rounded-xl shadow-lg bg-pancasila text-white flex items-center space-x-6">
+                <div class="flex-shrink-0 bg-white/20 p-4 rounded-full">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-extrabold">Pendidikan Pancasila</h1>
+                    <p class="text-lg md:text-xl text-amber-100 mt-1">Daftar Bab dan Sub Bab Pelajaran Pendidikan Pancasila Kelas 6</p>
+                </div>
+            </header>
+            <!-- Konten Bab dan Sub Bab -->
+            <main class="bg-white p-6 md:p-8 rounded-xl shadow-lg space-y-6">
+                <!-- Bab 1 -->
+                <div class="chapter-block">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-pancasila">Bab 1: Nilai-Nilai Pancasila</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-amber-50 text-pancasila bg-hover-pancasila hover:shadow-md transition-all duration-200">1.1 Pengamalan Sila Pertama</a>
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-amber-50 text-pancasila bg-hover-pancasila hover:shadow-md transition-all duration-200">1.2 Pengamalan Sila Kedua</a>
+                    </div>
+                </div>
+                <!-- Bab 2 -->
+                <div class="chapter-block">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-pancasila">Bab 2: Hak dan Kewajiban</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-amber-50 text-pancasila bg-hover-pancasila hover:shadow-md transition-all duration-200">2.1 Hak Anak di Rumah</a>
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-amber-50 text-pancasila bg-hover-pancasila hover:shadow-md transition-all duration-200">2.2 Kewajiban Siswa di Sekolah</a>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 5. Halaman SENI BUDAYA (Tersembunyi) -->
+    <div id="page-seni" class="hidden">
+        <div class="container mx-auto px-4 py-8 md:py-12">
+            <!-- Tombol Kembali -->
+            <div class="mb-8">
+                <a href="#" onclick="showPage('page-menu')" class="inline-flex items-center text-gray-700 font-medium text-lg hover:text-purple-600 transition-colors duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Kembali ke Daftar Pelajaran
+                </a>
+            </div>
+            <!-- Header Pelajaran -->
+            <header class="text-left mb-10 p-8 rounded-xl shadow-lg bg-seni text-white flex items-center space-x-6">
+                <div class="flex-shrink-0 bg-white/20 p-4 rounded-full">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536l12.232-12.232z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-extrabold">Seni Budaya</h1>
+                    <p class="text-lg md:text-xl text-purple-100 mt-1">Daftar Bab dan Sub Bab Pelajaran Seni Budaya Kelas 6</p>
+                </div>
+            </header>
+            <!-- Konten Bab dan Sub Bab -->
+            <main class="bg-white p-6 md:p-8 rounded-xl shadow-lg space-y-6">
+                <!-- Bab 1 -->
+                <div class="chapter-block">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-seni">Bab 1: Seni Rupa</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-purple-50 text-seni bg-hover-seni hover:shadow-md transition-all duration-200">1.1 Menggambar Ilustrasi</a>
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-purple-50 text-seni bg-hover-seni hover:shadow-md transition-all duration-200">1.2 Seni Patung Nusantara</a>
+                    </div>
+                </div>
+                <!-- Bab 2 -->
+                <div class="chapter-block">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-seni">Bab 2: Seni Musik</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-purple-50 text-seni bg-hover-seni hover:shadow-md transition-all duration-200">2.1 Interval Nada</a>
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-purple-50 text-seni bg-hover-seni hover:shadow-md transition-all duration-200">2.2 Alat Musik Daerah</a>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 6. Halaman PROJEK IPAS (Tersembunyi) -->
+    <div id="page-ipas" class="hidden">
+        <div class="container mx-auto px-4 py-8 md:py-12">
+            <!-- Tombol Kembali -->
+            <div class="mb-8">
+                <a href="#" onclick="showPage('page-menu')" class="inline-flex items-center text-gray-700 font-medium text-lg hover:text-cyan-600 transition-colors duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Kembali ke Daftar Pelajaran
+                </a>
+            </div>
+            <!-- Header Pelajaran -->
+            <header class="text-left mb-10 p-8 rounded-xl shadow-lg bg-ipas text-white flex items-center space-x-6">
+                <div class="flex-shrink-0 bg-white/20 p-4 rounded-full">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.97l-2.387.477a2 2 0 00-1.022.547m3.231-13.231l-2.387-.477a2 2 0 00-1.022.547l-2.387.477a6 6 0 000 7.96l2.387.477a2 2 0 001.022.547l2.387-.477a6 6 0 003.86-.97l2.387-.477a2 2 0 001.022-.547l-2.387-.477a6 6 0 000-7.96zM12 8v4l3 3"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-extrabold">Projek IPAS</h1>
+                    <p class="text-lg md:text-xl text-cyan-100 mt-1">Daftar Bab dan Sub Bab Pelajaran Projek IPAS Kelas 6</p>
+                </div>
+            </header>
+            <!-- Konten Bab dan Sub Bab -->
+            <main class="bg-white p-6 md:p-8 rounded-xl shadow-lg space-y-6">
+                <!-- Bab 1 -->
+                <div class="chapter-block">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-ipas">Bab 1: Energi di Sekitar Kita</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-cyan-50 text-ipas bg-hover-ipas hover:shadow-md transition-all duration-200">1.1 Sumber Energi</a>
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-cyan-50 text-ipas bg-hover-ipas hover:shadow-md transition-all duration-200">1.2 Energi Alternatif</a>
+                    </div>
+                </div>
+                <!-- Bab 2 -->
+                <div class="chapter-block">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-ipas">Bab 2: Sistem Tata Surya</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-cyan-50 text-ipas bg-hover-ipas hover:shadow-md transition-all duration-200">2.1 Planet-planet</a>
+                        <a href="#" target="_blank" class="block p-4 rounded-lg font-medium bg-cyan-50 text-ipas bg-hover-ipas hover:shadow-md transition-all duration-200">2.2 Gerhana Matahari dan Bulan</a>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+
+    <!-- Script JavaScript untuk Navigasi Halaman -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const headers = document.querySelectorAll('.subject-header');
-
-            headers.forEach(header => {
-                header.addEventListener('click', () => {
-                    const content = header.nextElementSibling; // Panel konten
-                    const arrow = header.querySelector('.arrow-icon'); // Ikon panah
-                    const isActive = content.style.maxHeight; // Cek apakah sudah terbuka
-
-                    // 1. Tutup semua panel lain
-                    headers.forEach(otherHeader => {
-                        if (otherHeader !== header) {
-                            const otherContent = otherHeader.nextElementSibling;
-                            const otherArrow = otherHeader.querySelector('.arrow-icon');
-                            
-                            otherContent.style.maxHeight = null;
-                            otherContent.style.opacity = '0';
-                            otherArrow.classList.remove('rotate-180');
-                        }
-                    });
-
-                    // 2. Buka atau tutup panel yang diklik
-                    if (isActive) {
-                        // Jika sudah terbuka, tutup
-                        content.style.maxHeight = null;
-                        content.style.opacity = '0';
-                        arrow.classList.remove('rotate-180');
-                    } else {
-                        // Jika tertutup, buka
-                        // scrollHeight memberikan tinggi asli dari konten di dalamnya
-                        content.style.maxHeight = content.scrollHeight + 'px';
-                        content.style.opacity = '1';
-                        arrow.classList.add('rotate-180');
-                    }
-                });
+        function showPage(pageId) {
+            // 1. Sembunyikan semua "halaman" (div yang id-nya dimulai dengan "page-")
+            const pages = document.querySelectorAll('div[id^="page-"]');
+            pages.forEach(page => {
+                page.classList.add('hidden');
             });
-        });
+
+            // 2. Tampilkan halaman yang diminta
+            const activePage = document.getElementById(pageId);
+            if (activePage) {
+                activePage.classList.remove('hidden');
+            }
+
+            // 3. Scroll ke atas halaman
+            window.scrollTo(0, 0);
+        }
     </script>
 
 </body>
