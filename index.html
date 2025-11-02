@@ -48,14 +48,16 @@
         }
         
         /* Style untuk sub-bab yang terkunci */
-        .sub-bab-item.locked {
-            opacity: 0.6;
-            cursor: not-allowed;
-            background-color: #f1f5f9; /* bg-slate-100 */
-        }
+        /* Style untuk sub-bab yang terkunci (dihapus karena semua terbuka) */
         
-        /* Style untuk sub-bab yang terbuka */
-        .sub-bab-item.unlocked:hover {
+        /* Style untuk semua sub-bab */
+        .sub-bab-item {
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        /* Style untuk sub-bab yang terbuka (sekarang berlaku untuk semua) */
+        .sub-bab-item:hover {
             background-color: #e0f2fe; /* bg-sky-100 */
         }
     </style>
@@ -66,13 +68,11 @@
     <header class="bg-white shadow-md sticky top-0 z-50">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
             <div class="text-3xl font-extrabold text-blue-600">
-                Zona Juara 6 🚀
+                Kelas 6
             </div>
-            <!-- Profil Siswa (Mockup) -->
+            <!-- Teks "Mari Mulai Belajar" -->
             <div class="flex items-center space-x-3">
-                <span class="font-semibold text-gray-700 hidden sm:block">Halo, Siswa Hebat!</span>
-                <img src="https://placehold.co/40x40/60A5FA/FFF?text=S" alt="Avatar Siswa" class="w-10 h-10 rounded-full border-2 border-blue-500">
-                <span class="font-bold text-yellow-500 bg-yellow-100 px-3 py-1 rounded-full text-sm">🌟 120 Poin</span>
+                <span class="font-semibold text-lg text-blue-600">Mari Mulai Belajar!</span>
             </div>
         </nav>
     </header>
@@ -156,10 +156,10 @@
                         </h4>
                         <div class="accordion-content">
                             <ul class="p-5 space-y-3">
-                                <li class="sub-bab-item unlocked p-4 rounded-lg font-semibold cursor-pointer border border-blue-200">📖 Sub Bab 1.1: Pengenalan Bilangan Bulat</li>
-                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.2: Operasi Penjumlahan & Pengurangan</li>
-                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.3: Operasi Perkalian & Pembagian</li>
-                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.4: Latihan Soal Cerita</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-blue-200">📖 Sub Bab 1.1: Pengenalan Bilangan Bulat</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-blue-200">📖 Sub Bab 1.2: Operasi Penjumlahan & Pengurangan</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-blue-200">📖 Sub Bab 1.3: Operasi Perkalian & Pembagian</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-blue-200">📖 Sub Bab 1.4: Latihan Soal Cerita</li>
                             </ul>
                         </div>
                     </div>
@@ -170,9 +170,9 @@
                         </h4>
                         <div class="accordion-content">
                             <ul class="p-5 space-y-3">
-                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 2.1: Mengenal Unsur-unsur Lingkaran</li>
-                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 2.2: Menghitung Keliling Lingkaran</li>
-                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 2.3: Menghitung Luas Lingkaran</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-blue-200">📖 Sub Bab 2.1: Mengenal Unsur-unsur Lingkaran</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-blue-200">📖 Sub Bab 2.2: Menghitung Keliling Lingkaran</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-blue-200">📖 Sub Bab 2.3: Menghitung Luas Lingkaran</li>
                             </ul>
                         </div>
                     </div>
@@ -187,9 +187,9 @@
                         </h4>
                         <div class="accordion-content">
                             <ul class="p-5 space-y-3">
-                                <li class="sub-bab-item unlocked p-4 rounded-lg font-semibold cursor-pointer border border-green-200">📖 Sub Bab 1.1: Ciri-ciri dan Struktur Teks Laporan</li>
-                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.2: Menemukan Ide Pokok</li>
-                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.3: Membuat Simpulan dari Teks</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-green-200">📖 Sub Bab 1.1: Ciri-ciri dan Struktur Teks Laporan</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-green-200">📖 Sub Bab 1.2: Menemukan Ide Pokok</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-green-200">📖 Sub Bab 1.3: Membuat Simpulan dari Teks</li>
                             </ul>
                         </div>
                     </div>
@@ -200,8 +200,8 @@
                         </h4>
                         <div class="accordion-content">
                             <ul class="p-5 space-y-3">
-                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 2.1: Struktur Teks Pidato</li>
-                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 2.2: Kalimat Persuasif dalam Pidato</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-green-200">📖 Sub Bab 2.1: Struktur Teks Pidato</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-green-200">📖 Sub Bab 2.2: Kalimat Persuasif dalam Pidato</li>
                             </ul>
                         </div>
                     </div>
@@ -216,8 +216,8 @@
                         </h4>
                         <div class="accordion-content">
                             <ul class="p-5 space-y-3">
-                                <li class="sub-bab-item unlocked p-4 rounded-lg font-semibold cursor-pointer border border-purple-200">📖 Sub-Chapter 1.1: Greeting and Leave-taking</li>
-                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub-Chapter 1.2: Asking and Giving Opinion</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-purple-200">📖 Sub-Chapter 1.1: Greeting and Leave-taking</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-purple-200">📖 Sub-Chapter 1.2: Asking and Giving Opinion</li>
                             </ul>
                         </div>
                     </div>
@@ -232,8 +232,8 @@
                         </h4>
                         <div class="accordion-content">
                             <ul class="p-5 space-y-3">
-                                <li class="sub-bab-item unlocked p-4 rounded-lg font-semibold cursor-pointer border border-red-200">📖 Sub Bab 1.1: Nilai Sila ke-1 dan ke-2</li>
-                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.2: Nilai Sila ke-3</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-red-200">📖 Sub Bab 1.1: Nilai Sila ke-1 dan ke-2</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-red-200">📖 Sub Bab 1.2: Nilai Sila ke-3</li>
                             </ul>
                         </div>
                     </div>
@@ -248,8 +248,8 @@
                         </h4>
                         <div class="accordion-content">
                             <ul class="p-5 space-y-3">
-                                <li class="sub-bab-item unlocked p-4 rounded-lg font-semibold cursor-pointer border border-yellow-200">📖 Sub Bab 1.1: Mengenal Reklame</li>
-                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.2: Ciri-ciri Poster yang Baik</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-yellow-200">📖 Sub Bab 1.1: Mengenal Reklame</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-yellow-200">📖 Sub Bab 1.2: Ciri-ciri Poster yang Baik</li>
                             </ul>
                         </div>
                     </div>
@@ -264,9 +264,9 @@
                         </h4>
                         <div class="accordion-content">
                             <ul class="p-5 space-y-3">
-                                <li class="sub-bab-item unlocked p-4 rounded-lg font-semibold cursor-pointer border border-teal-200">📖 Sub Bab 1.1: Mengenal Planet</li>
-                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.2: Rotasi dan Revolusi Bumi</li>
-                                <li class="sub-bab-item locked p-4 rounded-lg font-semibold border">🔒 Sub Bab 1.4: Peristiwa Gerhana</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-teal-200">📖 Sub Bab 1.1: Mengenal Planet</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-teal-200">📖 Sub Bab 1.2: Rotasi dan Revolusi Bumi</li>
+                                <li class="sub-bab-item p-4 rounded-lg font-semibold border border-teal-200">📖 Sub Bab 1.4: Peristiwa Gerhana</li>
                             </ul>
                         </div>
                     </div>
@@ -278,11 +278,12 @@
 
     <!-- ===== FOOTER ===== -->
     <footer class="text-center p-10 mt-12 border-t border-gray-200">
-        <p class="text-gray-600">© 2025 Zona Juara Kelas 6 - Dibuat dengan ❤️ untuk Siswa Hebat Indonesia. Oleh Pak Salim</p>
+        <p class="text-gray-600">© 2025 Zona Juara Kelas 6 - Dibuat dengan ❤️ untuk Siswa Hebat Indonesia.</p>
     </footer>
     
     <!-- ===== MODAL UNTUK MATERI (Tersembunyi) ===== -->
-    <div id="materi-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <!-- Lapisan overlay (bg-black bg-opacity-50) dihilangkan dari div di bawah ini -->
+    <div id="materi-modal" class="modal fixed inset-0 flex items-center justify-center z-50 p-4">
         <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl p-8 transform transition-all scale-95 opacity-0" id="modal-content-inner">
             <div class="flex justify-between items-center mb-4">
                 <h3 id="modal-title" class="text-2xl font-bold text-blue-700">Judul Sub Bab</h3>
@@ -317,7 +318,8 @@
             const subjectCards = document.querySelectorAll('.subject-card');
             const subjectContents = document.querySelectorAll('.subject-content');
             const accordionHeaders = document.querySelectorAll('.accordion-header');
-            const unlockedSubBabs = document.querySelectorAll('.sub-bab-item.unlocked');
+            // Memilih SEMUA sub-bab, karena semua sekarang bisa di-klik
+            const allSubBabs = document.querySelectorAll('.sub-bab-item');
             
             // Modal Elements
             const modal = document.getElementById('materi-modal');
@@ -369,7 +371,7 @@
             // --- Logika 2: Klik Tombol Kembali ---
             backButton.addEventListener('click', () => {
                 contentArea.style.display = 'none';
-                mainGrid.style.display = 'grid'; // Kembalikan ke grid
+                mainGrid.style.display = 'grid'; // Kembalikan ke grid (Perbaikan dari 'contentArea.style.display = 'grid'')
             });
 
             // --- Logika 3: Accordion (Bab) ---
@@ -390,8 +392,8 @@
                 });
             });
 
-            // --- Logika 4: Klik Sub-Bab yang Terbuka ---
-            unlockedSubBabs.forEach(bab => {
+            // --- Logika 4: Klik Sub-Bab ---
+            allSubBabs.forEach(bab => {
                 bab.addEventListener('click', () => {
                     const materiName = bab.innerText.replace('📖 ', ''); // Hapus emoji
                     
@@ -408,12 +410,17 @@
             closeModalButton.addEventListener('click', closeModal);
             modalSelesaiButton.addEventListener('click', closeModal);
             
+            /* <-- INI ADALAH PERBAIKANNYA
+                Fungsi di bawah ini dinonaktifkan karena overlay transparan sudah dihilangkan,
+                sehingga tidak membingungkan pengguna.
+            
             // Tutup modal jika klik di luar area konten
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     closeModal();
                 }
             });
+            */ // <-- INI ADALAH PERBAIKANNYA
 
         });
     </script>
