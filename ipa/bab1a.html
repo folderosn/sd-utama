@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eksplorasi Sistem Gerak Manusia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Warm Amber & Stone -->
+    <!-- Application Structure Plan: Desain aplikasi ini menggunakan pendekatan "dashboard tematik". Halaman utama menyajikan tiga pilar sistem gerak (Rangka, Otot, Sendi) sebagai tombol navigasi utama. Mengeklik salah satu akan memuat bagian detail khusus di bawahnya, menyembunyikan yang lain. Struktur ini dipilih untuk "memecah" informasi kompleks menjadi bagian-bagian yang dapat dikelola, memungkinkan siswa untuk fokus pada satu topik pada satu waktu. Interaksi di dalam setiap bagian (misalnya, sub-navigasi untuk 'Otot' dan 'Sendi') mendorong eksplorasi aktif alih-alih membaca pasif, yang sangat penting untuk retensi siswa SD. -->
+    <!-- Visualization & Content Choices: 
+        1. Rangka: Info (Fungsi) -> Goal (Informasi) -> Viz (Daftar) -> Interaksi (Tombol klik-untuk-lihat 'Fungsi Proteksi') -> Justifikasi (Mengonkretkan konsep abstrak 'perlindungan' dengan contoh interaktif) -> Metode (JS show/hide).
+        2. Otot: Info (3 Jenis Otot) -> Goal (Perbandingan & Pengorganisasian) -> Viz (Tombol Sub-Navigasi) -> Interaksi (Mengeklik tombol mengganti konten detail di sebelahnya) -> Justifikasi (UI 'Tab' intuitif untuk membandingkan kategori) -> Metode (JS show/hide).
+        3. Sendi: Info (6 Jenis Sendi) -> Goal (Eksplorasi & Pengorganisasian) -> Viz (Layout Master-Detail 2 kolom) -> Interaksi (Mengeklik nama sendi di daftar kiri memuat deskripsinya di panel kanan) -> Justifikasi (Menyajikan 6 item berbeda secara efisien tanpa membanjiri pengguna; mendorong penemuan) -> Metode (JS show/hide).
+        Tidak ada data kuantitatif dalam laporan sumber, sehingga tidak ada bagan (Chart.js) yang digunakan.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        .topic-content {
+            display: none;
+        }
+        
+        .nav-button.active {
+            background-color: #f59e0b; /* amber-500 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .sub-nav-button.active {
+            background-color: #fde68a; /* amber-200 */
+            font-weight: 600;
+        }
+
+        .detail-item {
+            display: none;
+        }
+
+        .detail-item.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-amber-50 text-stone-900 leading-relaxed">
+
+    <main class="container mx-auto max-w-5xl p-4 py-8 md:p-12">
+        
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-5xl font-bold text-amber-700 mb-3">Eksplorasi Sistem Gerak Manusia</h1>
+            <p class="text-lg md:text-xl text-stone-700">Materi IPA Interaktif untuk Kelas 6 SD</p>
+        </header>
+
+        <section class="bg-white p-6 rounded-2xl shadow-lg mb-8">
+            <h2 class="text-2xl font-bold text-stone-800 mb-3">Selamat Datang, Pak/Bu Guru!</h2>
+            <p class="text-base text-stone-700">Aplikasi ini mengubah materi "Rangka, Sendi, dan Otot" menjadi modul interaktif. Tubuh kita bisa bergerak karena kerja sama hebat antara tiga komponen utama. Gunakan tombol di bawah ini untuk menjelajahi masing-masing komponen dan menemukan cara kerjanya.</p>
+        </section>
+
+        <nav id="main-navigation" class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+            <button data-target="content-rangka" class="nav-button w-full p-6 text-2xl font-bold rounded-xl shadow-md transition duration-300 ease-in-out hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 bg-white flex items-center justify-center space-x-3">
+                <span class="text-3xl">🦴</span>
+                <span>Rangka</span>
+            </button>
+            <button data-target="content-otot" class="nav-button w-full p-6 text-2xl font-bold rounded-xl shadow-md transition duration-300 ease-in-out hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 bg-white flex items-center justify-center space-x-3">
+                <span class="text-3xl">💪</span>
+                <span>Otot</span>
+            </button>
+            <button data-target="content-sendi" class="nav-button w-full p-6 text-2xl font-bold rounded-xl shadow-md transition duration-300 ease-in-out hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 bg-white flex items-center justify-center space-x-3">
+                <span class="text-3xl">🤝</span>
+                <span>Sendi</span>
+            </button>
+        </nav>
+
+        <section id="detail-display" class="min-h-[400px]">
+            
+            <div id="placeholder-message" class="flex flex-col items-center justify-center text-center p-10 bg-white rounded-2xl shadow-inner-lg h-full">
+                <span class="text-6xl mb-4">👆</span>
+                <h3 class="text-2xl font-semibold text-stone-700">Silakan Pilih Topik</h3>
+                <p class="text-stone-600 max-w-md">Klik salah satu dari tiga tombol di atas (Rangka, Otot, atau Sendi) untuk memulai eksplorasi.</p>
+            </div>
+
+            <div id="content-rangka" class="topic-content bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+                <h2 class="text-3xl font-bold text-amber-700 mb-4 flex items-center space-x-3"><span class="text-4xl">🦴</span> <span>Rangka (Tulang)</span></h2>
+                <p class="text-lg mb-6 text-stone-700">Rangka adalah kumpulan dari seluruh tulang di tubuh kita (sekitar 206 tulang). Rangka adalah fondasi yang memberi kita bentuk dan kekuatan.</p>
+                
+                <h3 class="text-2xl font-semibold text-stone-800 mb-3">Fungsi Utama Rangka</h3>
+                <ul class="list-disc list-inside space-y-2 mb-6 text-stone-700 text-base">
+                    <li>Memberikan bentuk tubuh.</li>
+                    <li>Membantu tubuh berdiri tegak dan menopang tubuh.</li>
+                    <li>Melindungi organ-organ penting di dalam tubuh.</li>
+                    <li>Tempat melekatnya otot-otot.</li>
+                </ul>
+
+                <div class="bg-amber-50 p-5 rounded-lg border border-amber-200">
+                    <h4 class="text-xl font-semibold text-stone-800 mb-3">Interaksi: Fungsi Proteksi</h4>
+                    <p class="text-stone-700 mb-4">Rangka kita adalah pelindung hebat! Klik tombol di bawah untuk melihat organ apa yang dilindunginya.</p>
+                    <div class="flex flex-wrap gap-3 mb-4">
+                        <button data-target="proteksi-otak" class="proteksi-button bg-amber-200 hover:bg-amber-300 text-amber-800 font-semibold py-2 px-4 rounded-lg transition">Tengkorak</button>
+                        <button data-target="proteksi-jantung" class="proteksi-button bg-amber-200 hover:bg-amber-300 text-amber-800 font-semibold py-2 px-4 rounded-lg transition">Tulang Rusuk & Dada</button>
+                    </div>
+                    <div id="proteksi-detail" class="min-h-[60px] p-4 bg-white rounded-md shadow-sm">
+                        <p id="proteksi-placeholder" class="text-stone-500 italic">Pilih salah satu tulang untuk melihat apa yang dilindunginya...</p>
+                        <div id="proteksi-otak" class="detail-item text-lg">🧠 <strong>Otak</strong> kita yang lunak dan sangat penting aman di dalam lindungan tulang tengkorak yang keras.</div>
+                        <div id="proteksi-jantung" class="detail-item text-lg">❤️ <strong>Jantung</strong> dan <strong>Paru-paru</strong> 🫁 dilindungi oleh sangkar yang dibentuk oleh tulang rusuk dan tulang dada.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-otot" class="topic-content bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+                <h2 class="text-3xl font-bold text-amber-700 mb-4 flex items-center space-x-3"><span class="text-4xl">💪</span> <span>Otot</span></h2>
+                <p class="text-lg mb-6 text-stone-700">Otot adalah bagian tubuh yang menempel pada tulang dan berfungsi menggerakkan tubuh. Otot bisa memendek (kontraksi) dan memanjang (relaksasi).</p>
+                
+                <h3 class="text-2xl font-semibold text-stone-800 mb-3">Tiga Jenis Otot</h3>
+                <p class="text-stone-700 mb-4">Tubuh kita memiliki tiga jenis otot yang berbeda, masing-masing dengan tugas uniknya. Klik setiap jenis untuk mempelajari lebih lanjut.</p>
+                
+                <div class="md:flex gap-6">
+                    <nav class="flex flex-col md:w-1/3 mb-4 md:mb-0 space-y-2">
+                        <button data-target="otot-polos" class="sub-nav-button text-left w-full p-4 rounded-lg transition bg-amber-100 hover:bg-amber-200 font-medium">1. Otot Polos</button>
+                        <button data-target="otot-lurik" class="sub-nav-button text-left w-full p-4 rounded-lg transition bg-amber-100 hover:bg-amber-200 font-medium">2. Otot Lurik (Rangka)</button>
+                        <button data-target="otot-jantung" class="sub-nav-button text-left w-full p-4 rounded-lg transition bg-amber-100 hover:bg-amber-200 font-medium">3. Otot Jantung</button>
+                    </nav>
+                    
+                    <div id="otot-detail-display" class="md:w-2/3 bg-amber-50 p-5 rounded-lg border border-amber-200 min-h-[200px]">
+                        <p id="otot-placeholder" class="detail-item active text-stone-500 italic flex items-center justify-center h-full text-center">Pilih salah satu jenis otot di samping untuk melihat detailnya.</p>
+                        
+                        <div id="otot-polos" class="detail-item space-y-2">
+                            <h4 class="text-xl font-bold text-stone-800">Otot Polos</h4>
+                            <p><strong>Cara Kerja:</strong> Bekerja secara otomatis, tanpa kita sadari atau perintahkan.</p>
+                            <p><strong>Lokasi:</strong> Ditemukan di dinding organ dalam seperti usus (saluran pencernaan) dan pembuluh darah.</p>
+                            <p><strong>Contoh:</strong> Mendorong makanan di dalam usus.</p>
+                        </div>
+                        
+                        <div id="otot-lurik" class="detail-item space-y-2">
+                            <h4 class="text-xl font-bold text-stone-800">Otot Lurik (Otot Rangka)</h4>
+                            <p><strong>Cara Kerja:</strong> Bekerja secara sadar, sesuai perintah kita.</p>
+                            <p><strong>Lokasi:</strong> Menempel pada tulang (rangka) kita.</p>
+                            <p><strong>Contoh:</strong> Mengangkat tangan, berjalan, berlari, atau mengunyah makanan.</p>
+                        </div>
+                        
+                        <div id="otot-jantung" class="detail-item space-y-2">
+                            <h4 class="text-xl font-bold text-stone-800">Otot Jantung</h4>
+                            <p><strong>Cara Kerja:</strong> Bekerja secara otomatis, terus-menerus tanpa henti, bahkan saat kita tidur.</p>
+                            <p><strong>Lokasi:</strong> Hanya ditemukan di dinding jantung.</p>
+                            <p><strong>Contoh:</strong> Memompa darah ke seluruh tubuh.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-sendi" class="topic-content bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+                <h2 class="text-3xl font-bold text-amber-700 mb-4 flex items-center space-x-3"><span class="text-4xl">🤝</span> <span>Sendi</span></h2>
+                <p class="text-lg mb-6 text-stone-700">Sendi adalah tempat bertemunya dua tulang atau lebih. Sendi membuat tubuh kita bisa bergerak dengan lentur dan tidak kaku.</p>
+
+                <h3 class="text-2xl font-semibold text-stone-800 mb-3">Enam Macam Sendi</h3>
+                <p class="text-stone-700 mb-4">Berdasarkan gerakannya, ada berbagai macam sendi. Klik nama sendi di daftar kiri untuk melihat penjelasan dan contohnya di sebelah kanan.</p>
+
+                <div class="md:flex gap-6">
+                    <nav class="flex flex-col md:w-2/5 mb-4 md:mb-0 space-y-2">
+                        <button data-target="sendi-putar" class="sub-nav-button text-left w-full p-4 rounded-lg transition bg-amber-100 hover:bg-amber-200 font-medium">1. Sendi Putar</button>
+                        <button data-target="sendi-geser" class="sub-nav-button text-left w-full p-4 rounded-lg transition bg-amber-100 hover:bg-amber-200 font-medium">2. Sendi Geser</button>
+                        <button data-target="sendi-pelana" class="sub-nav-button text-left w-full p-4 rounded-lg transition bg-amber-100 hover:bg-amber-200 font-medium">3. Sendi Pelana</button>
+                        <button data-target="sendi-engsel" class="sub-nav-button text-left w-full p-4 rounded-lg transition bg-amber-100 hover:bg-amber-200 font-medium">4. Sendi Engsel</button>
+                        <button data-target="sendi-gulung" class="sub-nav-button text-left w-full p-4 rounded-lg transition bg-amber-100 hover:bg-amber-200 font-medium">5. Sendi Gulung</button>
+                        <button data-target="sendi-peluru" class="sub-nav-button text-left w-full p-4 rounded-lg transition bg-amber-100 hover:bg-amber-200 font-medium">6. Sendi Peluru</button>
+                    </nav>
+                    
+                    <div id="sendi-detail-display" class="md:w-3/5 bg-amber-50 p-5 rounded-lg border border-amber-200 min-h-[300px]">
+                        <p id="sendi-placeholder" class="detail-item active text-stone-500 italic flex items-center justify-center h-full text-center">Pilih salah satu sendi di samping untuk melihat detailnya.</p>
+                        
+                        <div id="sendi-putar" class="detail-item space-y-2">
+                            <h4 class="text-xl font-bold text-stone-800">Sendi Putar</h4>
+                            <p><strong>Gerakan:</strong> Memungkinkan gerakan memutar (satu tulang berputar mengelilingi tulang lain).</p>
+                            <p><strong>Contoh:</strong> Antara tulang leher dan tengkorak (saat kita menggelengkan kepala).</p>
+                        </div>
+                        
+                        <div id="sendi-geser" class="detail-item space-y-2">
+                            <h4 class="text-xl font-bold text-stone-800">Sendi Geser</h4>
+                            <p><strong>Gerakan:</strong> Memungkinkan gerakan menggeser antar tulang.</p>
+                            <p><strong>Contoh:</strong> Pada pergelangan tangan dan ruas-ruas tulang belakang.</p>
+                        </div>
+
+                        <div id="sendi-pelana" class="detail-item space-y-2">
+                            <h4 class="text-xl font-bold text-stone-800">Sendi Pelana</h4>
+                            <p><strong>Gerakan:</strong> Memungkinkan gerakan dua arah (seperti orang naik kuda).</p>
+                            <p><strong>Contoh:</strong> Pada pangkal ibu jari.</p>
+                        </div>
+
+                        <div id="sendi-engsel" class="detail-item space-y-2">
+                            <h4 class="text-xl font-bold text-stone-800">Sendi Engsel</h4>
+                            <p><strong>Gerakan:</strong> Bergerak satu arah (seperti engsel pintu), hanya bisa ditekuk atau diluruskan.</p>
+                            <p><strong>Contoh:</strong> Pada siku dan lutut.</p>
+                        </div>
+
+                        <div id="sendi-gulung" class="detail-item space-y-2">
+                            <h4 class="text-xl font-bold text-stone-800">Sendi Gulung</h4>
+                            <p><strong>Gerakan:</strong> Memungkinkan gerakan dua arah (depan-belakang atau kanan-kiri).</p>
+                            <p><strong>Contoh:</strong> Pada tulang rahang (saat mengunyah).</p>
+                        </div>
+
+                        <div id="sendi-peluru" class="detail-item space-y-2">
+                            <h4 class="text-xl font-bold text-stone-800">Sendi Peluru</h4>
+                            <p><strong>Gerakan:</strong> Memungkinkan gerakan ke segala arah, termasuk memutar.</p>
+                            <p><strong>Contoh:</strong> Pada bahu (antara lengan dan belikat) dan panggul (antara paha dan panggul).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+    
+    <footer class="text-center p-6 text-sm text-stone-500">
+        Dibuat berdasarkan materi IPA Kelas 6 | Sistem Gerak Manusia
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const mainNavButtons = document.querySelectorAll('#main-navigation .nav-button');
+            const topicContents = document.querySelectorAll('.topic-content');
+            const placeholderMessage = document.getElementById('placeholder-message');
+
+            mainNavButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+                    
+                    mainNavButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    topicContents.forEach(content => {
+                        content.style.display = 'none';
+                    });
+                    
+                    placeholderMessage.style.display = 'none';
+                    
+                    const targetContent = document.getElementById(targetId);
+                    if (targetContent) {
+                        targetContent.style.display = 'block';
+                    }
+                });
+            });
+
+            const setupSubNavigation = (navSelector, contentPrefix, placeholderId) => {
+                const navButtons = document.querySelectorAll(navSelector);
+                const placeholder = document.getElementById(placeholderId);
+                
+                navButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const targetId = button.dataset.target;
+                        
+                        navButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        
+                        document.querySelectorAll(`.${contentPrefix}-item`).forEach(item => {
+                            item.style.display = 'none';
+                        });
+
+                        if (placeholder) {
+                            placeholder.style.display = 'none';
+                        }
+                        
+                        const targetContent = document.getElementById(targetId);
+                        if (targetContent) {
+                            targetContent.style.display = 'block';
+                        }
+                    });
+                });
+            };
+
+            setupSubNavigation('#content-rangka .proteksi-button', 'detail', 'proteksi-placeholder');
+            setupSubNavigation('#content-otot .sub-nav-button', 'detail', 'otot-placeholder');
+            setupSubNavigation('#content-sendi .sub-nav-button', 'detail', 'sendi-placeholder');
+
+            const proteksiItems = document.querySelectorAll('#content-rangka .detail-item');
+            proteksiItems.forEach(item => item.style.display = 'none');
+            const ototItems = document.querySelectorAll('#content-otot .detail-item');
+            ototItems.forEach(item => item.style.display = 'none');
+            const sendiItems = document.querySelectorAll('#content-sendi .detail-item');
+            sendiItems.forEach(item => item.style.display = 'none');
+            
+            document.getElementById('proteksi-placeholder').style.display = 'block';
+            document.getElementById('otot-placeholder').style.display = 'block';
+            document.getElementById('otot-placeholder').classList.add('active');
+            document.getElementById('sendi-placeholder').style.display = 'block';
+            document.getElementById('sendi-placeholder').classList.add('active');
+        });
+    </script>
+
+</body>
+</html>
