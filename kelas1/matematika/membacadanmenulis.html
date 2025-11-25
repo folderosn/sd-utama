@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pasangkan Lambang Bilangan</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Font Poppins & Fredoka -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: #fdf2f8; /* Pinkish background */
+            background-image: radial-gradient(#fbcfe8 2px, transparent 2px);
+            background-size: 24px 24px;
+        }
+        .font-kids { font-family: 'Fredoka', sans-serif; }
+        
+        /* Animasi Pop */
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop { animation: popIn 0.4s ease-out forwards; }
+
+        /* Animasi Shake untuk Salah */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .animate-shake { animation: shake 0.3s ease-in-out; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Data Soal (0-10 sesuai gambar)
+        const DATA_SOAL = [
+            { id: 0, number: "0", text: "Nol", color: "text-orange-500" },
+            { id: 1, number: "1", text: "Satu", color: "text-green-500" },
+            { id: 2, number: "2", text: "Dua", color: "text-blue-500" },
+            { id: 3, number: "3", text: "Tiga", color: "text-purple-500" },
+            { id: 4, number: "4", text: "Empat", color: "text-yellow-500" },
+            { id: 5, number: "5", text: "Lima", color: "text-indigo-500" },
+            { id: 6, number: "6", text: "Enam", color: "text-lime-600" },
+            { id: 7, number: "7", text: "Tujuh", color: "text-cyan-500" },
+            { id: 8, number: "8", text: "Delapan", color: "text-green-600" },
+            { id: 9, number: "9", text: "Sembilan", color: "text-red-500" },
+            { id: 10, number: "10", text: "Sepuluh", color: "text-orange-600" },
+        ];
+
+        // Component Utama
+        const GameMatching = () => {
+            // State
+            const [leftSide, setLeftSide] = useState([]);
+            const [rightSide, setRightSide] = useState([]);
+            const [selectedStart, setSelectedStart] = useState(null); // {id, side: 'left'|'right'}
+            const [connections, setConnections] = useState([]); // Array of {leftId, rightId}
+            const [wrongFeedback, setWrongFeedback] = useState(false);
+            const [lines, setLines] = useState([]);
+            
+            const containerRef = useRef(null);
+
+            // Inisialisasi: Acak urutan soal agar tidak selalu urut
+            useEffect(() => {
+                const shuffledLeft = [...DATA_SOAL].sort(() => Math.random() - 0.5);
+                const shuffledRight = [...DATA_SOAL].sort(() => Math.random() - 0.5);
+                setLeftSide(shuffledLeft);
+                setRightSide(shuffledRight);
+            }, []);
+
+            // Fungsi Update Garis SVG
+            const updateLines = () => {
+                if (!containerRef.current) return;
+                const rect = containerRef.current.getBoundingClientRect();
+                
+                // Garis Permanen (Jawaban Benar)
+                const newLines = connections.map(conn => {
+                    const startEl = document.getElementById(`dot-left-${conn.leftId}`);
+                    const endEl = document.getElementById(`dot-right-${conn.rightId}`);
+                    if (!startEl || !endEl) return null;
+
+                    const startRect = startEl.getBoundingClientRect();
+                    const endRect = endEl.getBoundingClientRect();
+
+                    return {
+                        x1: startRect.left + startRect.width/2 - rect.left,
+                        y1: startRect.top + startRect.height/2 - rect.top,
+                        x2: endRect.left + endRect.width/2 - rect.left,
+                        y2: endRect.top + endRect.height/2 - rect.top,
+                        color: "#22c55e", // Hijau
+                        isTemp: false
+                    };
+                }).filter(Boolean);
+
+                setLines(newLines);
+            };
+
+            // Update garis saat window resize atau ada koneksi baru
+            useEffect(() => {
+                updateLines();
+                window.addEventListener('resize', updateLines);
+                return () => window.removeEventListener('resize', updateLines);
+            }, [connections]);
+            
+            // Re-render lines setelah render DOM selesai
+            useEffect(() => { setTimeout(updateLines, 100) }, [connections, leftSide]);
+
+            // Handler Klik Titik Kiri (Angka)
+            const handleLeftClick = (item) => {
+                // Cek apakah sudah terhubung
+                if (connections.find(c => c.leftId === item.id)) return;
+                
+                // Jika titik kanan sudah dipilih sebelumnya
+                if (selectedStart && selectedStart.side === 'right') {
+                    checkMatch(item.id, selectedStart.id);
+                } else {
+                    setSelectedStart({ id: item.id, side: 'left' });
+                    setWrongFeedback(false);
+                }
+            };
+
+            // Handler Klik Titik Kanan (Nama)
+            const handleRightClick = (item) => {
+                // Cek apakah sudah terhubung
+                if (connections.find(c => c.rightId === item.id)) return;
+
+                // Jika titik kiri sudah dipilih sebelumnya
+                if (selectedStart && selectedStart.side === 'left') {
+                    checkMatch(selectedStart.id, item.id);
+                } else {
+                    setSelectedStart({ id: item.id, side: 'right' });
+                    setWrongFeedback(false);
+                }
+            };
+
+            // Logika Cek Jawaban
+            const checkMatch = (leftId, rightId) => {
+                if (leftId === rightId) {
+                    // BENAR
+                    const newConn = [...connections, { leftId, rightId }];
+                    setConnections(newConn);
+                    setSelectedStart(null);
+                    // Suara efek bisa ditambahkan disini
+                } else {
+                    // SALAH
+                    setWrongFeedback(true);
+                    setSelectedStart(null);
+                    setTimeout(() => setWrongFeedback(false), 2000);
+                }
+            };
+
+            const resetGame = () => {
+                setConnections([]);
+                setSelectedStart(null);
+                setWrongFeedback(false);
+                const shuffledLeft = [...DATA_SOAL].sort(() => Math.random() - 0.5);
+                const shuffledRight = [...DATA_SOAL].sort(() => Math.random() - 0.5);
+                setLeftSide(shuffledLeft);
+                setRightSide(shuffledRight);
+            };
+
+            return (
+                <div className="min-h-screen py-10 px-4 flex flex-col items-center">
+                    
+                    {/* Header */}
+                    <div className="text-center mb-8">
+                        <h1 className="font-kids text-4xl md:text-5xl text-pink-600 mb-2 drop-shadow-sm">
+                            Pasangkan Bilangan
+                        </h1>
+                        <p className="text-gray-500 text-lg bg-white inline-block px-4 py-1 rounded-full shadow-sm border border-pink-100">
+                            Tarik garis dari Angka ke Namanya ya!
+                        </p>
+                    </div>
+
+                    {/* Area Game */}
+                    <div 
+                        ref={containerRef}
+                        className="relative w-full max-w-4xl bg-white rounded-3xl shadow-xl border-4 border-pink-200 p-6 md:p-10 flex justify-between"
+                        style={{ minHeight: '600px' }}
+                    >
+                        {/* SVG Layer untuk Garis */}
+                        <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
+                            {lines.map((line, idx) => (
+                                <line 
+                                    key={idx}
+                                    x1={line.x1} y1={line.y1}
+                                    x2={line.x2} y2={line.y2}
+                                    stroke={line.color}
+                                    strokeWidth="6"
+                                    strokeLinecap="round"
+                                    className="drop-shadow-sm transition-all duration-500"
+                                />
+                            ))}
+                        </svg>
+
+                        {/* Feedback Salah (Overlay) */}
+                        {wrongFeedback && (
+                            <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 rounded-2xl backdrop-blur-sm animate-pop">
+                                <div className="bg-white p-8 rounded-3xl text-center shadow-2xl border-b-8 border-red-200 transform scale-110 animate-shake">
+                                    <div className="text-6xl mb-4">😢</div>
+                                    <h2 className="font-kids text-3xl text-red-500 font-bold mb-2">Ups, Salah!</h2>
+                                    <p className="text-gray-600 font-bold">Silahkan Coba Lagi ya</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Kolom Kiri: Lambang Bilangan */}
+                        <div className="flex flex-col gap-6 w-5/12 z-10">
+                            {leftSide.map((item) => {
+                                const isConnected = connections.find(c => c.leftId === item.id);
+                                const isSelected = selectedStart?.id === item.id && selectedStart?.side === 'left';
+                                
+                                return (
+                                    <div key={item.id} className="flex items-center justify-end relative h-16">
+                                        {/* Kartu Angka */}
+                                        <div className={`
+                                            flex-1 mr-4 bg-pink-50 rounded-2xl border-2 flex items-center justify-center h-full shadow-sm transition-all
+                                            ${isConnected ? 'border-green-400 bg-green-50' : 'border-pink-200'}
+                                        `}>
+                                            <span className={`font-kids text-4xl font-bold ${item.color} drop-shadow-sm`}>
+                                                {item.number}
+                                            </span>
+                                            {/* Gambar Anak Kecil (Hiasan) - Opsional, menggunakan icon user saja agar ringan */}
+                                            <i className="fa-solid fa-child absolute left-4 text-pink-200 text-2xl opacity-50"></i>
+                                        </div>
+
+                                        {/* Titik Kiri */}
+                                        <div 
+                                            id={`dot-left-${item.id}`}
+                                            onClick={() => handleLeftClick(item)}
+                                            className={`
+                                                w-8 h-8 rounded-full border-4 cursor-pointer transition-all duration-300 transform
+                                                flex items-center justify-center shadow-md
+                                                ${isConnected 
+                                                    ? 'bg-green-500 border-green-200 scale-100' 
+                                                    : isSelected 
+                                                        ? 'bg-blue-500 border-blue-200 scale-125 ring-4 ring-blue-100' 
+                                                        : 'bg-white border-gray-300 hover:scale-110 hover:border-pink-400'
+                                                }
+                                            `}
+                                        >
+                                            {isConnected && <i className="fa-solid fa-check text-white text-xs"></i>}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Kolom Kanan: Nama Bilangan */}
+                        <div className="flex flex-col gap-6 w-5/12 z-10">
+                            {rightSide.map((item) => {
+                                const isConnected = connections.find(c => c.rightId === item.id);
+                                const isSelected = selectedStart?.id === item.id && selectedStart?.side === 'right';
+
+                                return (
+                                    <div key={item.id} className="flex items-center justify-start relative h-16">
+                                        {/* Titik Kanan */}
+                                        <div 
+                                            id={`dot-right-${item.id}`}
+                                            onClick={() => handleRightClick(item)}
+                                            className={`
+                                                w-8 h-8 rounded-full border-4 cursor-pointer transition-all duration-300 transform
+                                                flex items-center justify-center shadow-md z-20
+                                                ${isConnected 
+                                                    ? 'bg-green-500 border-green-200 scale-100' 
+                                                    : isSelected 
+                                                        ? 'bg-blue-500 border-blue-200 scale-125 ring-4 ring-blue-100' 
+                                                        : 'bg-white border-gray-300 hover:scale-110 hover:border-pink-400'
+                                                }
+                                            `}
+                                        >
+                                            {isConnected && <i className="fa-solid fa-check text-white text-xs"></i>}
+                                        </div>
+
+                                        {/* Kartu Nama */}
+                                        <div className={`
+                                            flex-1 ml-4 bg-white rounded-2xl border-2 flex items-center justify-center h-full shadow-sm transition-all
+                                            ${isConnected ? 'border-green-400 bg-green-50' : 'border-purple-200 bg-purple-50'}
+                                        `}>
+                                            <span className="font-kids text-xl md:text-2xl font-bold text-gray-700">
+                                                {item.text}
+                                            </span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Tombol Reset */}
+                    <div className="mt-8">
+                         <button 
+                            onClick={resetGame}
+                            className="bg-white border-2 border-pink-400 text-pink-500 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-pink-500 hover:text-white transition-all transform hover:-translate-y-1 active:scale-95 flex items-center gap-2"
+                        >
+                            <i className="fa-solid fa-rotate-right"></i> Ulangi Permainan
+                        </button>
+                    </div>
+
+                    <footer className="mt-10 text-center text-pink-300 font-kids text-sm">
+                        Belajar Matematika itu Menyenangkan! 🌟
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<GameMatching />);
+    </script>
+</body>
+</html>
