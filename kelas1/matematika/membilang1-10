@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guru SD Interactive - Belajar Berhitung</title>
+    
+    <!-- 1. Tailwind CSS (Untuk Tampilan) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. React & ReactDOM (Engine Aplikasi) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- 3. Babel (Agar kode React bisa jalan di browser biasa) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        
+        /* Animasi Kustom */
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(-5%); }
+            50% { transform: translateY(5%); }
+        }
+        .animate-bounce-slow {
+            animation: bounce-slow 2s infinite;
+        }
+
+        /* Animasi Fade In sederhana */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-blue-50">
+    <!-- WADAH APLIKASI -->
+    <div id="root"></div>
+
+    <!-- LOGIKA APLIKASI -->
+    <script type="text/babel">
+        // ------------------------------------------
+        // 1. SETUP & UTILITIES
+        // ------------------------------------------
+        const { useState, useEffect, useRef } = React;
+
+        // Ikon Sederhana (SVG Manual)
+        const IconRefreshCw = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+        );
+        const IconCheck = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"/></svg>
+        );
+        const IconX = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        );
+        const IconHome = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        );
+        const IconTrophy = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        );
+
+        // ------------------------------------------
+        // 2. KOMPONEN VISUAL (GAMBAR & BINGKAI)
+        // ------------------------------------------
+
+        const TenFrame = ({ count }) => (
+            <div className="grid grid-cols-5 gap-1 border-2 border-gray-400 bg-white p-1 w-full max-w-[140px]">
+                {[...Array(10)].map((_, i) => (
+                    <div key={i} className="aspect-square border border-gray-300 flex items-center justify-center">
+                        {i < count && <div className="w-3/4 h-3/4 bg-red-600 rounded-full shadow-sm"></div>}
+                    </div>
+                ))}
+            </div>
+        );
+
+        const Icons = {
+            Seesaw: () => (
+                <svg viewBox="0 0 100 60" className="w-16 h-16 mx-auto">
+                    <rect x="10" y="40" width="80" height="6" fill="#3b82f6" rx="3" />
+                    <path d="M45 40 L50 25 L55 40 Z" fill="#ef4444" />
+                    <circle cx="20" cy="35" r="3" fill="#f59e0b" />
+                    <circle cx="80" cy="35" r="3" fill="#f59e0b" />
+                </svg>
+            ),
+            Swing: () => (
+                <svg viewBox="0 0 100 100" className="w-16 h-16 mx-auto">
+                    <path d="M20 10 L10 90 M80 10 L90 90 M20 10 L80 10" stroke="#3b82f6" strokeWidth="3" fill="none"/>
+                    <line x1="30" y1="10" x2="30" y2="60" stroke="#f59e0b" strokeWidth="2" />
+                    <line x1="70" y1="10" x2="70" y2="60" stroke="#f59e0b" strokeWidth="2" />
+                    <rect x="25" y="60" width="50" height="5" fill="#ef4444" rx="2" />
+                </svg>
+            ),
+            Slide: () => (
+                <svg viewBox="0 0 100 80" className="w-16 h-16 mx-auto">
+                    <path d="M20 20 L20 70 M20 20 L40 70 L90 70 Z" fill="none" stroke="#f59e0b" strokeWidth="3" />
+                    <path d="M20 25 Q 50 25 80 70" stroke="#3b82f6" strokeWidth="6" fill="none" strokeLinecap="round"/>
+                    <line x1="20" y1="30" x2="20" y2="70" stroke="#8b5cf6" strokeWidth="3" />
+                </svg>
+            ),
+            Bicycle: () => (
+                <svg viewBox="0 0 100 60" className="w-16 h-16 mx-auto">
+                    <circle cx="20" cy="45" r="12" stroke="#333" strokeWidth="3" fill="none" />
+                    <circle cx="80" cy="45" r="12" stroke="#333" strokeWidth="3" fill="none" />
+                    <path d="M20 45 L40 25 L70 25 L80 45 M40 25 L35 45" stroke="#ec4899" strokeWidth="3" fill="none" />
+                </svg>
+            ),
+            Chair: () => (
+                <svg viewBox="0 0 60 80" className="w-12 h-16 mx-auto">
+                    <path d="M15 50 L15 75 M45 50 L45 75 M15 50 L45 50 L45 20 L15 20 Z" stroke="#854d0e" strokeWidth="4" fill="#fef3c7" />
+                </svg>
+            ),
+            Book: () => (
+                <svg viewBox="0 0 60 50" className="w-12 h-12 mx-auto">
+                    <rect x="5" y="10" width="50" height="30" rx="2" fill="#3b82f6" />
+                    <path d="M5 25 L55 25" stroke="white" strokeWidth="2" />
+                    <path d="M5 15 L55 15" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+                </svg>
+            ),
+            Kite: () => (
+                <svg viewBox="0 0 60 80" className="w-12 h-16 mx-auto">
+                    <path d="M30 5 L50 25 L30 55 L10 25 Z" fill="#facc15" stroke="#f59e0b" strokeWidth="2" />
+                    <line x1="30" y1="5" x2="30" y2="55" stroke="#f59e0b" />
+                    <line x1="10" y1="25" x2="50" y2="25" stroke="#f59e0b" />
+                    <path d="M30 55 Q 30 70 40 75" stroke="#ef4444" strokeWidth="2" fill="none" />
+                </svg>
+            ),
+            Marble: () => (
+                <svg viewBox="0 0 40 40" className="w-8 h-8 mx-auto">
+                    <circle cx="20" cy="20" r="15" fill="#a855f7" />
+                    <circle cx="15" cy="15" r="5" fill="rgba(255,255,255,0.4)" />
+                </svg>
+            ),
+            Balloon: () => (
+                <svg viewBox="0 0 50 80" className="w-10 h-16 mx-auto">
+                    <ellipse cx="25" cy="30" rx="20" ry="25" fill="#ef4444" />
+                    <line x1="25" y1="55" x2="25" y2="75" stroke="#333" strokeWidth="1" />
+                </svg>
+            ),
+            Ball: () => (
+                <svg viewBox="0 0 50 50" className="w-10 h-10 mx-auto">
+                    <circle cx="25" cy="25" r="20" fill="#facc15" stroke="#ca8a04" strokeWidth="1"/>
+                    <path d="M5 25 Q 25 5 45 25 Q 25 45 5 25" fill="#ef4444" opacity="0.8" />
+                </svg>
+            )
+        };
+
+        const ObjectGroup = ({ type, count, scale = 1 }) => {
+            const Icon = Icons[type] || Icons.Ball;
+            return (
+                <div className="flex flex-wrap gap-2 justify-center items-center p-2 bg-blue-50 rounded-lg border border-blue-100 min-h-[80px]">
+                    {[...Array(count)].map((_, i) => (
+                        <div key={i} style={{ transform: `scale(${scale})` }}>
+                            <Icon />
+                        </div>
+                    ))}
+                </div>
+            );
+        };
+
+        // ------------------------------------------
+        // 3. DATA SOAL
+        // ------------------------------------------
+
+        const LEVEL_1_DATA = [
+            { id: 1, count: 1, type: 'Seesaw', text: '1 - Satu' },
+            { id: 2, count: 2, type: 'Swing', text: '2 - Dua' },
+            { id: 3, count: 3, type: 'Slide', text: '3 - Tiga' },
+            { id: 4, count: 4, type: 'Bicycle', text: '4 - Empat' },
+            { id: 5, count: 5, type: 'Chair', text: '5 - Lima' },
+        ];
+
+        const LEVEL_2_DATA = [
+            { id: 6, count: 6, type: 'Book', text: '6 - Enam' },
+            { id: 7, count: 7, type: 'Kite', text: '7 - Tujuh' },
+            { id: 8, count: 8, type: 'Marble', text: '8 - Delapan' },
+            { id: 9, count: 9, type: 'Balloon', text: '9 - Sembilan' },
+            { id: 10, count: 10, type: 'Ball', text: '10 - Sepuluh' },
+        ];
+
+        // ------------------------------------------
+        // 4. LEVEL 1: MENJODOHKAN (DRAG/CLICK & DROP)
+        // ------------------------------------------
+
+        const LevelOne = ({ onComplete }) => {
+            const [items] = useState(LEVEL_1_DATA);
+            const [frames, setFrames] = useState([...LEVEL_1_DATA].sort(() => Math.random() - 0.5));
+            const [numbers, setNumbers] = useState([...LEVEL_1_DATA].sort(() => Math.random() - 0.5));
+            
+            const [selectedItem, setSelectedItem] = useState(null); 
+            const [placements, setPlacements] = useState({});
+            const [feedback, setFeedback] = useState(null);
+
+            const handleSelect = (type, item) => {
+                setSelectedItem({ type, data: item });
+                setFeedback(null);
+            };
+
+            const handleDrop = (targetId, slotType) => {
+                if (!selectedItem) return;
+                
+                // Cek Tipe Kartu
+                if (selectedItem.type !== slotType) {
+                    setFeedback({ type: 'error', msg: 'Jenis kartu tidak cocok!' });
+                    setTimeout(() => setFeedback(null), 1500);
+                    return;
+                }
+
+                // Cek Jawaban Benar
+                if (selectedItem.data.id === targetId) {
+                    const newPlacements = { ...placements };
+                    if (!newPlacements[targetId]) newPlacements[targetId] = {};
+                    newPlacements[targetId][slotType] = selectedItem.data;
+                    setPlacements(newPlacements);
+
+                    // Hapus dari Bank Pilihan
+                    if (slotType === 'frame') {
+                        setFrames(frames.filter(f => f.id !== selectedItem.data.id));
+                    } else {
+                        setNumbers(numbers.filter(n => n.id !== selectedItem.data.id));
+                    }
+                    
+                    setSelectedItem(null);
+                    setFeedback({ type: 'success', msg: 'Benar!' });
+                    setTimeout(() => setFeedback(null), 1000);
+                } else {
+                    setFeedback({ type: 'error', msg: 'Kurang tepat, coba lagi ya!' });
+                    setTimeout(() => setFeedback(null), 1500);
+                }
+            };
+
+            // Cek Selesai
+            const isComplete = Object.keys(placements).length === 5 && 
+                            Object.values(placements).every(p => p.frame && p.number);
+
+            useEffect(() => {
+                if (isComplete) {
+                    setTimeout(onComplete, 2000);
+                }
+            }, [isComplete, onComplete]);
+
+            return (
+                <div className="p-4 max-w-4xl mx-auto fade-in">
+                    <h2 className="text-2xl font-bold text-center text-blue-600 mb-6 bg-blue-50 py-2 rounded-xl">
+                        Pasangkan Bingkai dan Angka yang Tepat!
+                    </h2>
+                    
+                    {/* Feedback Popup */}
+                    {feedback && (
+                        <div className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-8 py-6 rounded-2xl shadow-2xl z-50 text-2xl font-bold animate-bounce
+                        ${feedback.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
+                        {feedback.type === 'success' ? <IconCheck className="inline w-8 h-8 mr-2"/> : <IconX className="inline w-8 h-8 mr-2"/>}
+                        {feedback.msg}
+                        </div>
+                    )}
+
+                    {/* Area Soal */}
+                    <div className="space-y-6 mb-12">
+                        <div className="grid grid-cols-12 gap-4 font-bold text-gray-500 text-center pb-2 border-b">
+                            <div className="col-span-4">Benda</div>
+                            <div className="col-span-4">Bingkai 10</div>
+                            <div className="col-span-4">Lambang Bilangan</div>
+                        </div>
+
+                        {items.map((item) => (
+                            <div key={item.id} className="grid grid-cols-12 gap-4 items-center bg-white p-3 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                
+                                {/* Kolom Benda */}
+                                <div className="col-span-4">
+                                    <ObjectGroup type={item.type} count={item.count} scale={0.7} />
+                                </div>
+
+                                {/* Kolom Drop Bingkai */}
+                                <div 
+                                    onClick={() => handleDrop(item.id, 'frame')}
+                                    className={`col-span-4 min-h-[80px] rounded-xl flex items-center justify-center border-2 border-dashed cursor-pointer transition-all
+                                        ${placements[item.id]?.frame ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-gray-50 hover:bg-blue-50'}
+                                        ${selectedItem?.type === 'frame' && !placements[item.id]?.frame ? 'ring-2 ring-blue-400 animate-pulse' : ''}
+                                    `}
+                                >
+                                    {placements[item.id]?.frame ? (
+                                        <div className="scale-75"><TenFrame count={item.count} /></div>
+                                    ) : (
+                                        <span className="text-gray-400 text-sm">Letakkan Bingkai</span>
+                                    )}
+                                </div>
+
+                                {/* Kolom Drop Angka */}
+                                <div 
+                                    onClick={() => handleDrop(item.id, 'number')}
+                                    className={`col-span-4 min-h-[80px] rounded-xl flex items-center justify-center border-2 border-dashed cursor-pointer transition-all
+                                        ${placements[item.id]?.number ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-gray-50 hover:bg-blue-50'}
+                                        ${selectedItem?.type === 'number' && !placements[item.id]?.number ? 'ring-2 ring-blue-400 animate-pulse' : ''}
+                                    `}
+                                >
+                                    {placements[item.id]?.number ? (
+                                        <div className="text-center">
+                                            <div className="text-3xl font-bold text-gray-800">{item.count}</div>
+                                            <div className="text-sm text-gray-600 font-medium">{item.text.split('-')[1]}</div>
+                                        </div>
+                                    ) : (
+                                        <span className="text-gray-400 text-sm">Letakkan Angka</span>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Area Pilihan Jawaban (Sticky Bottom) */}
+                    {!isComplete && (
+                        <div className="sticky bottom-4 bg-white/95 backdrop-blur shadow-[0_-4px_20px_rgba(0,0,0,0.1)] p-4 rounded-2xl border border-blue-100 z-40">
+                            <div className="text-center text-sm text-gray-500 mb-2 font-medium">Klik item di bawah ini, lalu klik kotak kosong di atas</div>
+                            
+                            <div className="flex justify-between gap-8">
+                                {/* Bank Bingkai */}
+                                <div className="flex-1 overflow-x-auto pb-2">
+                                    <div className="flex gap-4">
+                                        {frames.length === 0 && <div className="text-gray-400 text-sm italic w-full text-center py-4">Bingkai Selesai!</div>}
+                                        {frames.map(f => (
+                                            <div 
+                                                key={f.id} 
+                                                onClick={() => handleSelect('frame', f)}
+                                                className={`min-w-[100px] p-2 bg-white border-2 rounded-lg cursor-pointer transform transition-all hover:-translate-y-1 shadow-sm
+                                                    ${selectedItem?.data?.id === f.id && selectedItem?.type === 'frame' ? 'border-blue-500 ring-2 ring-blue-200 scale-105' : 'border-gray-200'}
+                                                `}
+                                            >
+                                                <div className="scale-50 origin-top-left w-[200%]"><TenFrame count={f.count} /></div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="w-px bg-gray-200 mx-2"></div>
+
+                                {/* Bank Angka */}
+                                <div className="flex-1 overflow-x-auto pb-2">
+                                    <div className="flex gap-4">
+                                        {numbers.length === 0 && <div className="text-gray-400 text-sm italic w-full text-center py-4">Angka Selesai!</div>}
+                                        {numbers.map(n => (
+                                            <div 
+                                                key={n.id} 
+                                                onClick={() => handleSelect('number', n)}
+                                                className={`min-w-[80px] h-[70px] flex flex-col items-center justify-center bg-white border-2 rounded-lg cursor-pointer transform transition-all hover:-translate-y-1 shadow-sm
+                                                    ${selectedItem?.data?.id === n.id && selectedItem?.type === 'number' ? 'border-purple-500 ring-2 ring-purple-200 scale-105' : 'border-gray-200'}
+                                                `}
+                                            >
+                                                <span className="text-2xl font-bold text-gray-800">{n.count}</span>
+                                                <span className="text-xs text-gray-500">{n.text.split(' - ')[1]}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // ------------------------------------------
+        // 5. LEVEL 2: MENARIK GARIS
+        // ------------------------------------------
+
+        const LevelTwo = ({ onComplete }) => {
+            const [leftItems] = useState([...LEVEL_2_DATA].sort(() => Math.random() - 0.5));
+            const [rightItems] = useState([...LEVEL_2_DATA].sort(() => Math.random() - 0.5));
+            
+            const [selectedLeft, setSelectedLeft] = useState(null);
+            const [connections, setConnections] = useState([]); 
+            const [wrongAttempt, setWrongAttempt] = useState(false);
+            
+            const svgRef = useRef(null);
+            const containerRef = useRef(null);
+            const [lineCoords, setLineCoords] = useState([]);
+
+            const updateLines = () => {
+                if (!containerRef.current) return;
+                const containerRect = containerRef.current.getBoundingClientRect();
+                const newCoords = connections.map(conn => {
+                    const leftEl = document.getElementById(`dot-left-${conn.leftId}`);
+                    const rightEl = document.getElementById(`dot-right-${conn.rightId}`);
+                    if (!leftEl || !rightEl) return null;
+                    
+                    const leftRect = leftEl.getBoundingClientRect();
+                    const rightRect = rightEl.getBoundingClientRect();
+
+                    return {
+                        x1: leftRect.left + leftRect.width/2 - containerRect.left,
+                        y1: leftRect.top + leftRect.height/2 - containerRect.top,
+                        x2: rightRect.left + rightRect.width/2 - containerRect.left,
+                        y2: rightRect.top + rightRect.height/2 - containerRect.top,
+                        color: '#22c55e'
+                    };
+                }).filter(Boolean);
+                setLineCoords(newCoords);
+            };
+
+            useEffect(() => {
+                updateLines();
+                window.addEventListener('resize', updateLines);
+                return () => window.removeEventListener('resize', updateLines);
+            }, [connections, selectedLeft]);
+
+            useEffect(() => { setTimeout(updateLines, 100) }, [connections]);
+
+            const handleLeftClick = (id) => {
+                if (connections.find(c => c.leftId === id)) return;
+                setSelectedLeft(id);
+                setWrongAttempt(false);
+            };
+
+            const handleRightClick = (id, count) => {
+                if (!selectedLeft) return;
+                if (connections.find(c => c.rightId === id)) return;
+
+                const leftItem = leftItems.find(i => i.id === selectedLeft);
+                
+                if (leftItem.count === count) {
+                    setConnections([...connections, { leftId: selectedLeft, rightId: id }]);
+                    setSelectedLeft(null);
+                } else {
+                    setWrongAttempt(true);
+                    setTimeout(() => setWrongAttempt(false), 2000);
+                }
+            };
+
+            const isAllConnected = connections.length === LEVEL_2_DATA.length;
+
+            useEffect(() => {
+                if(isAllConnected) setTimeout(onComplete, 2000);
+            }, [isAllConnected, onComplete])
+
+            return (
+                <div className="p-4 max-w-4xl mx-auto relative min-h-[600px] fade-in" ref={containerRef}>
+                    <h2 className="text-2xl font-bold text-center text-blue-600 mb-8 bg-blue-50 py-2 rounded-xl">
+                        Tarik Garis untuk Menghubungkan!
+                    </h2>
+
+                    {/* Garis SVG */}
+                    <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-10" ref={svgRef}>
+                        {lineCoords.map((line, i) => (
+                            <line key={i} x1={line.x1} y1={line.y1} x2={line.x2} y2={line.y2} stroke={line.color} strokeWidth="4" strokeLinecap="round" />
+                        ))}
+                    </svg>
+
+                    {/* Pesan Salah Besar */}
+                    {wrongAttempt && (
+                        <div className="absolute inset-0 bg-black/60 z-50 flex items-center justify-center rounded-xl backdrop-blur-sm fade-in">
+                            <div className="bg-white p-8 rounded-3xl text-center shadow-2xl transform scale-110">
+                                <div className="text-6xl mb-4">❌</div>
+                                <h3 className="text-4xl font-extrabold text-red-600 mb-2">Ups, Salah!</h3>
+                                <p className="text-2xl font-bold text-gray-700">Silahkan Coba Lagi</p>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex justify-between relative z-20">
+                        {/* Kolom Kiri */}
+                        <div className="space-y-8 w-5/12">
+                            {leftItems.map((item) => {
+                                const isConnected = connections.find(c => c.leftId === item.id);
+                                return (
+                                    <div key={item.id} className="relative flex items-center justify-between bg-white p-4 rounded-xl shadow-md border border-gray-100 min-h-[100px]">
+                                        <div className="flex-1 pr-4">
+                                            <ObjectGroup type={item.type} count={item.count} scale={0.5} />
+                                        </div>
+                                        <div 
+                                            id={`dot-left-${item.id}`}
+                                            onClick={() => handleLeftClick(item.id)}
+                                            className={`w-8 h-8 rounded-full border-4 cursor-pointer transition-all transform hover:scale-110 flex items-center justify-center
+                                                ${isConnected ? 'bg-green-500 border-green-200' : 
+                                                selectedLeft === item.id ? 'bg-blue-500 border-blue-200 scale-125 ring-4 ring-blue-100' : 'bg-gray-300 border-gray-100 hover:bg-blue-400'}
+                                            `}
+                                        >
+                                            {isConnected && <IconCheck className="w-4 h-4 text-white" />}
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+
+                        {/* Kolom Kanan */}
+                        <div className="space-y-8 w-5/12">
+                            {rightItems.map((item) => {
+                                const isConnected = connections.find(c => c.rightId === item.id);
+                                return (
+                                    <div key={item.id} className="relative flex items-center justify-between bg-white p-2 rounded-xl shadow-md border border-gray-100 min-h-[100px]">
+                                        <div 
+                                            id={`dot-right-${item.id}`}
+                                            onClick={() => handleRightClick(item.id, item.count)}
+                                            className={`w-8 h-8 rounded-full border-4 cursor-pointer transition-all transform hover:scale-110 -ml-4 mr-2 flex items-center justify-center shadow-sm
+                                                ${isConnected ? 'bg-green-500 border-green-200' : 'bg-gray-300 border-gray-100 hover:bg-purple-400'}
+                                            `}
+                                        >
+                                            {isConnected && <IconCheck className="w-4 h-4 text-white" />}
+                                        </div>
+
+                                        <div className="flex-1 flex items-center gap-2">
+                                            <div className="w-1/2 scale-75 origin-left">
+                                                <TenFrame count={item.count} />
+                                            </div>
+                                            <div className="w-1/2 text-center border-l pl-2">
+                                                <div className="text-4xl font-bold text-gray-800">{item.count}</div>
+                                                <div className="text-sm font-semibold text-gray-500">{item.text.split(' - ')[1]}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ------------------------------------------
+        // 6. MAIN APP
+        // ------------------------------------------
+
+        const SoalMatematikaApp = () => {
+            const [currentLevel, setCurrentLevel] = useState('menu'); 
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 font-[Poppins] pb-10">
+                    
+                    <header className="bg-white shadow-sm py-4 mb-6">
+                        <div className="max-w-4xl mx-auto px-4 flex justify-between items-center">
+                            <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+                                Guru SD Interactive
+                            </h1>
+                            {currentLevel !== 'menu' && (
+                                <button onClick={() => setCurrentLevel('menu')} className="p-2 hover:bg-gray-100 rounded-full text-gray-600">
+                                    <IconHome className="w-6 h-6" />
+                                </button>
+                            )}
+                        </div>
+                    </header>
+
+                    {currentLevel === 'menu' && (
+                        <div className="max-w-2xl mx-auto px-4 pt-10 text-center space-y-8 fade-in">
+                            <h2 className="text-4xl font-bold text-gray-800 mb-2">Mari Belajar Berhitung!</h2>
+                            <p className="text-gray-600 text-lg mb-8">Pilih latihanmu hari ini:</p>
+                            
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <button 
+                                    onClick={() => setCurrentLevel('level1')}
+                                    className="group bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all border-b-8 border-blue-200 hover:border-blue-400 hover:-translate-y-2"
+                                >
+                                    <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl group-hover:scale-110 transition-transform">1️⃣</div>
+                                    <h3 className="text-2xl font-bold text-gray-800 mb-2">Bilangan 1 - 5</h3>
+                                    <p className="text-gray-500 text-sm">Menjodohkan Benda & Angka</p>
+                                </button>
+
+                                <button 
+                                    onClick={() => setCurrentLevel('level2')}
+                                    className="group bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all border-b-8 border-purple-200 hover:border-purple-400 hover:-translate-y-2"
+                                >
+                                    <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl group-hover:scale-110 transition-transform">✏️</div>
+                                    <h3 className="text-2xl font-bold text-gray-800 mb-2">Bilangan 6 - 10</h3>
+                                    <p className="text-gray-500 text-sm">Tarik Garis & Pasangkan</p>
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {currentLevel === 'level1' && (
+                        <LevelOne onComplete={() => setCurrentLevel('finish')} />
+                    )}
+
+                    {currentLevel === 'level2' && (
+                        <LevelTwo onComplete={() => setCurrentLevel('finish')} />
+                    )}
+
+                    {currentLevel === 'finish' && (
+                        <div className="max-w-md mx-auto mt-20 text-center p-8 bg-white rounded-3xl shadow-2xl fade-in">
+                            <IconTrophy className="w-32 h-32 mx-auto text-yellow-400 mb-6 animate-bounce-slow" />
+                            <h2 className="text-4xl font-bold text-gray-800 mb-4">Luar Biasa!</h2>
+                            <p className="text-xl text-gray-600 mb-8">Kamu sudah menyelesaikan latihan dengan sangat baik.</p>
+                            
+                            <button 
+                                onClick={() => setCurrentLevel('menu')}
+                                className="bg-blue-600 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-blue-700 hover:scale-105 transition-all shadow-lg flex items-center justify-center gap-2 mx-auto"
+                            >
+                                <IconRefreshCw className="w-5 h-5"/> Main Lagi
+                            </button>
+                        </div>
+                    )}
+
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<SoalMatematikaApp />);
+    </script>
+</body>
+</html>
