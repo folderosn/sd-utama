@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ikatan Bilangan - Kelas 1 SD</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Font Poppins & Fredoka -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: #fffbeb; /* Creamy yellow background */
+            background-image: radial-gradient(#fcd34d 2px, transparent 2px);
+            background-size: 24px 24px;
+            user-select: none; 
+            -webkit-user-select: none;
+        }
+        .font-kids { font-family: 'Fredoka', sans-serif; }
+        
+        /* Custom Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* Input Styles */
+        .number-input:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.3);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <div id="root" class="flex-grow"></div>
+
+    <!-- FOOTER SECTION -->
+    <footer class="bg-white border-t-4 border-yellow-400 py-4 mt-auto">
+        <div class="container mx-auto text-center">
+            <p class="font-kids text-gray-600 text-sm md:text-base">
+                Dibuat oleh <span class="font-bold text-yellow-600">Abdul Salim Owner Folder OSN</span>
+            </p>
+            <a href="https://pakabdulsalim.blogspot.com/" target="_blank" class="inline-block mt-1 text-blue-500 hover:text-blue-700 font-bold hover:underline transition-all">
+                Kunjungi: https://pakabdulsalim.blogspot.com
+            </a>
+        </div>
+    </footer>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- ASSETS (SVG ICONS) ---
+        const Icons = {
+            Orange: () => (
+                <svg viewBox="0 0 100 100" className="w-10 h-10 md:w-14 md:h-14 drop-shadow-sm inline-block m-1 animate-float">
+                    <circle cx="50" cy="55" r="40" fill="#f97316" />
+                    <path d="M50 15 Q 65 5 65 20 Q 55 25 50 15" fill="#4ade80" />
+                    <circle cx="30" cy="45" r="4" fill="rgba(255,255,255,0.3)" />
+                </svg>
+            ),
+            Salak: () => (
+                <svg viewBox="0 0 100 100" className="w-10 h-10 md:w-14 md:h-14 drop-shadow-sm inline-block m-1 animate-float" style={{animationDelay: '0.5s'}}>
+                    <path d="M50 10 Q 80 40 85 70 Q 80 95 50 90 Q 20 95 15 70 Q 20 40 50 10" fill="#713f12" />
+                    <path d="M20 50 L80 50 M30 70 L70 70 M40 30 L60 30" stroke="rgba(255,255,255,0.2)" strokeWidth="2" />
+                </svg>
+            ),
+            Apple: () => (
+                <svg viewBox="0 0 100 100" className="w-10 h-10 md:w-14 md:h-14 drop-shadow-sm inline-block m-1 animate-float">
+                    <path d="M50 15 Q 60 0 75 10 Q 95 25 85 55 Q 80 90 50 90 Q 20 90 15 55 Q 5 25 25 10 Q 40 0 50 15" fill="#ef4444" />
+                    <path d="M50 15 Q 65 5 65 20" fill="#4ade80" />
+                </svg>
+            ),
+            Star: () => (
+                <svg viewBox="0 0 100 100" className="w-10 h-10 md:w-14 md:h-14 drop-shadow-sm inline-block m-1 animate-float" style={{animationDelay: '0.2s'}}>
+                    <polygon points="50,10 61,40 95,40 67,60 78,90 50,70 22,90 33,60 5,40 39,40" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2" />
+                </svg>
+            ),
+            Car: () => (
+                <svg viewBox="0 0 100 100" className="w-10 h-10 md:w-14 md:h-14 drop-shadow-sm inline-block m-1 animate-float">
+                    <path d="M10 50 L20 20 L80 20 L90 50 L90 70 L10 70 Z" fill="#3b82f6" />
+                    <circle cx="30" cy="70" r="10" fill="#1f2937" />
+                    <circle cx="70" cy="70" r="10" fill="#1f2937" />
+                </svg>
+            ),
+            Ball: () => (
+                <svg viewBox="0 0 100 100" className="w-10 h-10 md:w-14 md:h-14 drop-shadow-sm inline-block m-1 animate-float" style={{animationDelay: '0.4s'}}>
+                    <circle cx="50" cy="50" r="40" fill="#f472b6" stroke="#db2777" strokeWidth="2" />
+                    <path d="M10 50 Q 50 20 90 50" fill="none" stroke="white" strokeWidth="3" />
+                </svg>
+            ),
+            Donut: () => (
+                <svg viewBox="0 0 100 100" className="w-10 h-10 md:w-14 md:h-14 drop-shadow-sm inline-block m-1 animate-float">
+                    <circle cx="50" cy="50" r="40" fill="#fcd34d" />
+                    <circle cx="50" cy="50" r="15" fill="#fffbeb" />
+                    <path d="M50 50 m -25, 0 a 25,25 0 1,0 50,0 a 25,25 0 1,0 -50,0" fill="none" stroke="#ec4899" strokeWidth="10" />
+                </svg>
+            ),
+            Candy: () => (
+                <svg viewBox="0 0 100 100" className="w-10 h-10 md:w-14 md:h-14 drop-shadow-sm inline-block m-1 animate-float" style={{animationDelay: '0.3s'}}>
+                    <circle cx="50" cy="50" r="30" fill="#a855f7" />
+                    <path d="M20 20 L40 40 M60 60 L80 80" stroke="#a855f7" strokeWidth="10" />
+                </svg>
+            )
+        };
+
+        // --- DATA SOAL (8 ITEMS) ---
+        const QUESTIONS = [
+            { id: 1, typeA: 'Orange', countA: 4, typeB: 'Salak', countB: 5, total: 9, mode: 'findParts' }, // Like Image 2
+            { id: 2, typeA: 'Apple', countA: 3, typeB: 'Star', countB: 4, total: 7, mode: 'findParts' }, // Like Image 1 Concept
+            { id: 3, typeA: 'Car', countA: 2, typeB: 'Ball', countB: 3, total: 5, mode: 'findTotal' }, // Variation
+            { id: 4, typeA: 'Donut', countA: 6, typeB: 'Candy', countB: 2, total: 8, mode: 'findParts' },
+            { id: 5, typeA: 'Orange', countA: 5, typeB: 'Apple', countB: 5, total: 10, mode: 'findTotal' },
+            { id: 6, typeA: 'Star', countA: 1, typeB: 'Car', countB: 5, total: 6, mode: 'findParts' },
+            { id: 7, typeA: 'Salak', countA: 2, typeB: 'Donut', countB: 2, total: 4, mode: 'findTotal' },
+            { id: 8, typeA: 'Ball', countA: 3, typeB: 'Candy', countB: 5, total: 8, mode: 'findParts' }
+        ];
+
+        const speak = (text) => {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID';
+                window.speechSynthesis.speak(utterance);
+            }
+        };
+
+        const App = () => {
+            const [currentIdx, setCurrentIdx] = useState(0);
+            const [inputA, setInputA] = useState('');
+            const [inputB, setInputB] = useState('');
+            const [inputTotal, setInputTotal] = useState('');
+            const [feedback, setFeedback] = useState(null); // 'correct', 'wrong'
+            const [isFinished, setIsFinished] = useState(false);
+
+            const q = QUESTIONS[currentIdx];
+
+            useEffect(() => {
+                // Reset inputs when question changes
+                setInputA('');
+                setInputB('');
+                setInputTotal('');
+                setFeedback(null);
+                
+                const instructions = q.mode === 'findParts' 
+                    ? "Hitung bendanya, lalu isi lingkaran kosongnya ya!" 
+                    : "Berapa jumlah semuanya? Isi lingkaran besarnya!";
+                speak(instructions);
+            }, [currentIdx]);
+
+            const handleCheck = () => {
+                let isCorrect = false;
+
+                if (q.mode === 'findParts') {
+                    // User must fill Parts. Total is given.
+                    // Allow A and B to be swapped (e.g. 4+5 or 5+4)
+                    const valA = parseInt(inputA);
+                    const valB = parseInt(inputB);
+                    if (
+                        (valA === q.countA && valB === q.countB) || 
+                        (valA === q.countB && valB === q.countA)
+                    ) {
+                        isCorrect = true;
+                    }
+                } else {
+                    const valTotal = parseInt(inputTotal);
+                    if (valTotal === q.total) isCorrect = true;
+                }
+
+                if (isCorrect) {
+                    setFeedback('correct');
+                    speak("Hebat! Jawabanmu benar.");
+                    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                    
+                    setTimeout(() => {
+                        if (currentIdx < QUESTIONS.length - 1) {
+                            setCurrentIdx(prev => prev + 1);
+                        } else {
+                            setIsFinished(true);
+                            speak("Selamat! Kamu sudah menyelesaikan semua soal.");
+                        }
+                    }, 2000);
+                } else {
+                    setFeedback('wrong');
+                    speak("Coba hitung lagi ya.");
+                    setTimeout(() => setFeedback(null), 1500);
+                }
+            };
+
+            const renderObjects = (Type, count) => (
+                <div className="flex flex-wrap justify-center gap-1 bg-white p-4 rounded-2xl border-2 border-yellow-200 shadow-sm min-h-[100px] items-center w-full">
+                    {[...Array(count)].map((_, i) => <Type key={i} />)}
+                </div>
+            );
+
+            if (isFinished) {
+                return (
+                    <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 text-center">
+                        <div className="text-9xl mb-4 animate-bounce">🏆</div>
+                        <h1 className="font-kids text-4xl text-yellow-600 mb-4">Hore! Selesai!</h1>
+                        <p className="text-xl text-gray-600 mb-8">Kamu jago berhitung!</p>
+                        <button 
+                            onClick={() => { setIsFinished(false); setCurrentIdx(0); }}
+                            className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105"
+                        >
+                            Ulangi Lagi
+                        </button>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="flex flex-col items-center py-6 px-4 max-w-2xl mx-auto w-full">
+                    
+                    {/* Header */}
+                    <div className="w-full flex justify-between items-center mb-6">
+                        <span className="bg-yellow-100 text-yellow-700 px-4 py-1 rounded-full font-bold text-sm">
+                            Soal {currentIdx + 1} / {QUESTIONS.length}
+                        </span>
+                        <h1 className="font-kids text-2xl text-yellow-600 font-bold">Ikatan Bilangan</h1>
+                    </div>
+
+                    {/* Question Card */}
+                    <div className="bg-white rounded-3xl p-6 shadow-xl border-4 border-yellow-300 w-full relative">
+                        
+                        {/* Object Display */}
+                        <div className="grid grid-cols-2 gap-4 mb-8">
+                            <div className="flex flex-col items-center gap-2">
+                                {renderObjects(Icons[q.typeA], q.countA)}
+                            </div>
+                            <div className="flex flex-col items-center gap-2">
+                                {renderObjects(Icons[q.typeB], q.countB)}
+                            </div>
+                        </div>
+
+                        {/* Number Bond Diagram */}
+                        <div className="relative flex items-center justify-center py-4">
+                            {/* SVG Connection Lines */}
+                            <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-0" viewBox="0 0 400 200">
+                                <line x1="100" y1="100" x2="200" y2="100" stroke="#d1d5db" strokeWidth="4" />
+                                <line x1="300" y1="100" x2="200" y2="100" stroke="#d1d5db" strokeWidth="4" />
+                            </svg>
+                            
+                            <div className="flex items-center gap-8 md:gap-16 z-10 w-full justify-center">
+                                
+                                {/* MAIN CIRCLE (TOTAL) */}
+                                <div className="relative">
+                                    <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-purple-500 bg-white flex items-center justify-center shadow-lg z-10">
+                                        {q.mode === 'findTotal' ? (
+                                            <input 
+                                                type="number" 
+                                                value={inputTotal}
+                                                onChange={(e) => setInputTotal(e.target.value)}
+                                                className="w-full h-full text-center text-4xl font-bold text-purple-600 rounded-full number-input"
+                                                placeholder="?"
+                                            />
+                                        ) : (
+                                            <span className="text-4xl font-bold text-purple-600">{q.total}</span>
+                                        )}
+                                    </div>
+                                    {/* Lines connecting to parts */}
+                                    <div className="absolute top-1/2 left-full w-12 h-1 bg-purple-300 transform -translate-y-1/2 origin-left rotate-[-25deg]"></div>
+                                    <div className="absolute top-1/2 left-full w-12 h-1 bg-purple-300 transform -translate-y-1/2 origin-left rotate-[25deg]"></div>
+                                </div>
+
+                                {/* PART CIRCLES */}
+                                <div className="flex flex-col gap-6 pl-8">
+                                    {/* Part A */}
+                                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-orange-400 bg-white flex items-center justify-center shadow-lg">
+                                        {q.mode === 'findParts' ? (
+                                            <input 
+                                                type="number" 
+                                                value={inputA}
+                                                onChange={(e) => setInputA(e.target.value)}
+                                                className="w-full h-full text-center text-3xl font-bold text-orange-600 rounded-full number-input"
+                                                placeholder="?"
+                                            />
+                                        ) : (
+                                            <span className="text-3xl font-bold text-orange-600">{q.countA}</span>
+                                        )}
+                                    </div>
+                                    
+                                    {/* Part B */}
+                                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-orange-400 bg-white flex items-center justify-center shadow-lg">
+                                        {q.mode === 'findParts' ? (
+                                            <input 
+                                                type="number" 
+                                                value={inputB}
+                                                onChange={(e) => setInputB(e.target.value)}
+                                                className="w-full h-full text-center text-3xl font-bold text-orange-600 rounded-full number-input"
+                                                placeholder="?"
+                                            />
+                                        ) : (
+                                            <span className="text-3xl font-bold text-orange-600">{q.countB}</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        {/* Submit Button */}
+                        <div className="mt-8 text-center">
+                            <button 
+                                onClick={handleCheck}
+                                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-12 rounded-full shadow-lg transform transition active:scale-95 text-xl flex items-center justify-center gap-2 mx-auto"
+                            >
+                                <i className="fa-solid fa-check-circle"></i> Cek Jawaban
+                            </button>
+                        </div>
+
+                        {/* Feedback Overlay */}
+                        {feedback === 'wrong' && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-3xl z-50 animate-pop">
+                                <div className="bg-red-100 p-6 rounded-2xl border-4 border-red-200 text-center shadow-xl">
+                                    <div className="text-5xl mb-2">🤔</div>
+                                    <h2 className="font-kids text-2xl text-red-500 font-bold">Ups, hitung lagi ya!</h2>
+                                </div>
+                            </div>
+                        )}
+
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
