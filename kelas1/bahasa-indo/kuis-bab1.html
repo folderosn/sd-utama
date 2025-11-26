@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif Kelas 1: Bunyi Apa?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: #FFFBEB; /* Cream lembut */
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Styling untuk Game Drag & Drop */
+        .draggable-item {
+            cursor: grab;
+            transition: transform 0.2s, box-shadow 0.2s;
+            touch-action: none; /* Penting untuk mobile */
+        }
+        .draggable-item:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+            z-index: 50;
+        }
+        .drop-zone {
+            transition: all 0.3s;
+        }
+        .drop-zone.drag-over {
+            background-color: #FEF3C7; /* Kuning terang */
+            transform: scale(1.05);
+            border-color: #F59E0B;
+        }
+
+        /* Styling untuk Game Garis */
+        .match-container {
+            position: relative;
+        }
+        .match-point {
+            width: 20px;
+            height: 20px;
+            background-color: #3B82F6;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 4px solid white;
+            box-shadow: 0 0 0 2px #3B82F6;
+            transition: transform 0.2s;
+        }
+        .match-point:hover {
+            transform: scale(1.2);
+            background-color: #F59E0B;
+            box-shadow: 0 0 0 2px #F59E0B;
+        }
+        .match-item {
+            position: relative;
+            z-index: 10;
+        }
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        line {
+            stroke-width: 5;
+            stroke-linecap: round;
+        }
+
+        /* Modal Sukses */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .confetti {
+            animation: bounce 1s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <!-- Header -->
+    <header class="bg-blue-400 text-white p-4 shadow-lg sticky top-0 z-50 border-b-4 border-blue-600">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold drop-shadow-md">🎈 Bahasa Indonesia Bab 1</h1>
+                <p class="text-blue-100 text-sm">Kelas 1 SD • Bunyi Apa?</p>
+            </div>
+            <div class="bg-white text-blue-600 px-4 py-2 rounded-full font-bold shadow">
+                Nilai: <span id="score">0</span> / 100
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 space-y-12 flex-grow w-full">
+
+        <!-- Intro Suara -->
+        <div class="text-center bg-blue-50 p-4 rounded-xl border border-blue-200">
+            <p class="text-blue-600 font-bold mb-2">🔊 Aktifkan suara agar belajar lebih seru!</p>
+            <button onclick="initAudio(); speak('Halo, ayo kita bermain dan belajar!'); this.style.display='none'" class="bg-blue-500 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-600">
+                Klik Di Sini Untuk Mulai Suara
+            </button>
+        </div>
+
+        <!-- GAME 1: DRAG AND DROP -->
+        <section id="game-dnd" class="bg-white rounded-3xl shadow-xl border-4 border-orange-200 overflow-hidden">
+            <div class="bg-orange-100 p-6 border-b-4 border-orange-200 text-center">
+                <h2 class="text-2xl font-bold text-orange-600 mb-2">1. Kotak Suku Kata</h2>
+                <p class="text-lg">Tarik benda di bawah ke kotak suku kata yang benar!</p>
+            </div>
+            
+            <div class="p-6">
+                <!-- Drop Zones (Kotak Tujuan) -->
+                <div class="grid grid-cols-5 gap-2 md:gap-4 mb-10">
+                    <div class="drop-zone bg-red-50 border-2 border-dashed border-red-300 rounded-xl h-32 flex flex-col items-center justify-center relative" data-target="ba">
+                        <span class="text-4xl font-bold text-red-400 opacity-50 absolute">Ba</span>
+                    </div>
+                    <div class="drop-zone bg-blue-50 border-2 border-dashed border-blue-300 rounded-xl h-32 flex flex-col items-center justify-center relative" data-target="bi">
+                        <span class="text-4xl font-bold text-blue-400 opacity-50 absolute">Bi</span>
+                    </div>
+                    <div class="drop-zone bg-green-50 border-2 border-dashed border-green-300 rounded-xl h-32 flex flex-col items-center justify-center relative" data-target="bu">
+                        <span class="text-4xl font-bold text-green-400 opacity-50 absolute">Bu</span>
+                    </div>
+                    <div class="drop-zone bg-yellow-50 border-2 border-dashed border-yellow-300 rounded-xl h-32 flex flex-col items-center justify-center relative" data-target="be">
+                        <span class="text-4xl font-bold text-yellow-400 opacity-50 absolute">Be</span>
+                    </div>
+                    <div class="drop-zone bg-purple-50 border-2 border-dashed border-purple-300 rounded-xl h-32 flex flex-col items-center justify-center relative" data-target="bo">
+                        <span class="text-4xl font-bold text-purple-400 opacity-50 absolute">Bo</span>
+                    </div>
+                </div>
+
+                <!-- Draggable Items (Benda) -->
+                <div class="flex flex-wrap justify-center gap-4 min-h-[100px]" id="draggable-container">
+                    <!-- Item 1: Bola (Bo) -->
+                    <div class="draggable-item bg-white border-2 border-gray-200 shadow-md rounded-lg p-2 w-24 text-center cursor-grab" draggable="true" data-id="bola" data-match="bo" onmousedown="speak('Bola')">
+                        <div class="text-4xl mb-1">⚽</div>
+                        <div class="font-bold text-sm">Bola</div>
+                    </div>
+                    <!-- Item 2: Batu (Ba) -->
+                    <div class="draggable-item bg-white border-2 border-gray-200 shadow-md rounded-lg p-2 w-24 text-center cursor-grab" draggable="true" data-id="batu" data-match="ba" onmousedown="speak('Batu')">
+                        <div class="text-4xl mb-1">🪨</div>
+                        <div class="font-bold text-sm">Batu</div>
+                    </div>
+                    <!-- Item 3: Biru (Bi) -->
+                    <div class="draggable-item bg-white border-2 border-gray-200 shadow-md rounded-lg p-2 w-24 text-center cursor-grab" draggable="true" data-id="biru" data-match="bi" onmousedown="speak('Biru')">
+                        <div class="text-4xl mb-1">🔵</div>
+                        <div class="font-bold text-sm">Biru</div>
+                    </div>
+                    <!-- Item 4: Buku (Bu) -->
+                    <div class="draggable-item bg-white border-2 border-gray-200 shadow-md rounded-lg p-2 w-24 text-center cursor-grab" draggable="true" data-id="buku" data-match="bu" onmousedown="speak('Buku')">
+                        <div class="text-4xl mb-1">📖</div>
+                        <div class="font-bold text-sm">Buku</div>
+                    </div>
+                    <!-- Item 5: Bebek (Be) -->
+                    <div class="draggable-item bg-white border-2 border-gray-200 shadow-md rounded-lg p-2 w-24 text-center cursor-grab" draggable="true" data-id="bebek" data-match="be" onmousedown="speak('Bebek')">
+                        <div class="text-4xl mb-1">🦆</div>
+                        <div class="font-bold text-sm">Bebek</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GAME 2: CONNECT LINES -->
+        <section id="game-line" class="bg-white rounded-3xl shadow-xl border-4 border-green-200 overflow-hidden">
+            <div class="bg-green-100 p-6 border-b-4 border-green-200 text-center">
+                <h2 class="text-2xl font-bold text-green-600 mb-2">2. Jodohkan Bunyi</h2>
+                <p class="text-lg">Tarik garis dari benda ke bunyi yang sesuai!</p>
+            </div>
+
+            <div class="p-6 relative match-container min-h-[400px]" id="match-area">
+                <svg id="svg-lines">
+                    <line id="current-line" x1="0" y1="0" x2="0" y2="0" stroke="#3B82F6" stroke-dasharray="5,5" style="display:none;" />
+                </svg>
+
+                <div class="flex justify-between items-stretch h-full">
+                    
+                    <!-- Left Column (Questions) -->
+                    <div class="flex flex-col justify-around w-1/3 space-y-6">
+                        <!-- Q1 -->
+                        <div class="match-item bg-blue-50 p-4 rounded-xl border-2 border-blue-200 flex items-center justify-between shadow-sm" data-id="q-bola">
+                            <div class="text-center w-full">
+                                <div class="text-3xl">⚽💥</div>
+                                <div class="text-xs font-bold mt-1">Bola kena batu</div>
+                            </div>
+                            <div class="match-point ml-2" data-type="start" data-val="duk" data-speak="Bola kena batu"></div>
+                        </div>
+                        <!-- Q2 -->
+                        <div class="match-item bg-blue-50 p-4 rounded-xl border-2 border-blue-200 flex items-center justify-between shadow-sm" data-id="q-hujan">
+                            <div class="text-center w-full">
+                                <div class="text-3xl">🌧️</div>
+                                <div class="text-xs font-bold mt-1">Hujan</div>
+                            </div>
+                            <div class="match-point ml-2" data-type="start" data-val="tik" data-speak="Hujan turun"></div>
+                        </div>
+                        <!-- Q3 -->
+                        <div class="match-item bg-blue-50 p-4 rounded-xl border-2 border-blue-200 flex items-center justify-between shadow-sm" data-id="q-sapi">
+                            <div class="text-center w-full">
+                                <div class="text-3xl">🐮</div>
+                                <div class="text-xs font-bold mt-1">Sapi</div>
+                            </div>
+                            <div class="match-point ml-2" data-type="start" data-val="moo" data-speak="Sapi"></div>
+                        </div>
+                        <!-- Q4 -->
+                        <div class="match-item bg-blue-50 p-4 rounded-xl border-2 border-blue-200 flex items-center justify-between shadow-sm" data-id="q-ayam">
+                            <div class="text-center w-full">
+                                <div class="text-3xl">🐔</div>
+                                <div class="text-xs font-bold mt-1">Ayam</div>
+                            </div>
+                            <div class="match-point ml-2" data-type="start" data-val="kukuruyuk" data-speak="Ayam jago"></div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column (Answers) -->
+                    <div class="flex flex-col justify-around w-1/3 space-y-6">
+                        <!-- A1 -->
+                        <div class="match-item bg-yellow-50 p-4 rounded-xl border-2 border-yellow-200 flex items-center justify-between shadow-sm flex-row-reverse" data-id="a-tik">
+                            <div class="text-center w-full">
+                                <div class="text-lg md:text-xl font-bold text-slate-800">"Tik! Tik!"</div>
+                            </div>
+                            <div class="match-point mr-2" data-type="end" data-val="tik" data-speak="Bunyi Tik Tik"></div>
+                        </div>
+                        <!-- A2 -->
+                        <div class="match-item bg-yellow-50 p-4 rounded-xl border-2 border-yellow-200 flex items-center justify-between shadow-sm flex-row-reverse" data-id="a-moo">
+                            <div class="text-center w-full">
+                                <div class="text-lg md:text-xl font-bold text-slate-800">"Mooo..."</div>
+                            </div>
+                            <div class="match-point mr-2" data-type="end" data-val="moo" data-speak="Bunyi Mooo"></div>
+                        </div>
+                        <!-- A3 -->
+                        <div class="match-item bg-yellow-50 p-4 rounded-xl border-2 border-yellow-200 flex items-center justify-between shadow-sm flex-row-reverse" data-id="a-kukuruyuk">
+                            <div class="text-center w-full">
+                                <div class="text-lg md:text-xl font-bold text-slate-800">"Kukuruyuk"</div>
+                            </div>
+                            <div class="match-point mr-2" data-type="end" data-val="kukuruyuk" data-speak="Bunyi Kukuruyuk"></div>
+                        </div>
+                        <!-- A4 -->
+                        <div class="match-item bg-yellow-50 p-4 rounded-xl border-2 border-yellow-200 flex items-center justify-between shadow-sm flex-row-reverse" data-id="a-duk">
+                            <div class="text-center w-full">
+                                <div class="text-lg md:text-xl font-bold text-slate-800">"Duk! Duk!"</div>
+                            </div>
+                            <div class="match-point mr-2" data-type="end" data-val="duk" data-speak="Bunyi Duk Duk"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Reset Button -->
+        <div class="text-center">
+            <button onclick="location.reload()" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transform active:scale-95 transition">
+                Ulangi Semua 🔄
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blue-600 text-white py-6 mt-8">
+        <div class="max-w-4xl mx-auto text-center px-4">
+            <p class="font-bold text-lg mb-2">Oleh : Abdul Salim</p>
+            <p>Kunjungi : <a href="https://pakabdulsalim.blogspot.com" target="_blank" class="underline hover:text-yellow-300 transition">https://pakabdulsalim.blogspot.com</a></p>
+            <p class="text-blue-200 text-xs mt-4">Media Pembelajaran Interaktif Kelas 1 SD</p>
+        </div>
+    </footer>
+
+    <!-- Modal Success -->
+    <div id="success-modal" class="modal">
+        <div class="bg-white rounded-3xl p-8 max-w-sm text-center shadow-2xl animate-bounce-in mx-4">
+            <div class="text-6xl mb-4 confetti">🎉</div>
+            <h2 class="text-3xl font-bold text-green-500 mb-2">Hore! Kamu Hebat!</h2>
+            <p class="text-gray-600 mb-6">Kamu sudah menyelesaikan kuis ini.</p>
+            <p class="text-2xl font-bold text-blue-600 mb-6">Nilai: 100</p>
+            <button onclick="document.getElementById('success-modal').classList.remove('show'); speak('Sampai jumpa lagi!')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full w-full">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- AUDIO ENGINE ---
+        let audioCtx;
+        
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function playSound(type) {
+            initAudio();
+            if (!audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'success') {
+                // High pitch ping
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(500, now);
+                osc.frequency.exponentialRampToValueAtTime(1000, now + 0.1);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'error') {
+                // Low pitch buzz
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            }
+        }
+        
+        // Initialize audio on first user interaction
+        document.body.addEventListener('click', () => initAudio(), { once: true });
+
+
+        // --- GAME LOGIC GLOBAL ---
+        let totalScore = 0;
+        let tasksCompleted = 0;
+        const totalTasks = 9; // 5 drag items + 4 lines
+        const scoreDisplay = document.getElementById('score');
+
+        function updateScore(points) {
+            totalScore += points;
+            scoreDisplay.innerText = Math.round((totalScore / totalTasks) * 100); 
+            tasksCompleted++;
+
+            if (tasksCompleted === totalTasks) {
+                setTimeout(() => {
+                    scoreDisplay.innerText = "100";
+                    playSound('success');
+                    speak("Selamat! Nilai kamu seratus. Kamu hebat sekali!");
+                    document.getElementById('success-modal').classList.add('show');
+                }, 1000);
+            }
+        }
+
+        // --- GAME 1: DRAG AND DROP ---
+        const draggables = document.querySelectorAll('.draggable-item');
+        const dropZones = document.querySelectorAll('.drop-zone');
+
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dragstart', () => {
+                draggable.classList.add('dragging');
+            });
+
+            draggable.addEventListener('dragend', () => {
+                draggable.classList.remove('dragging');
+            });
+        });
+
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', e => {
+                e.preventDefault();
+                zone.classList.add('drag-over');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('drag-over');
+            });
+
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                const draggable = document.querySelector('.dragging');
+                
+                if(!draggable) return;
+
+                const matchType = draggable.getAttribute('data-match');
+                const targetType = zone.getAttribute('data-target');
+                const itemName = draggable.querySelector('.font-bold').innerText;
+
+                if (matchType === targetType) {
+                    // Correct!
+                    zone.appendChild(draggable);
+                    draggable.setAttribute('draggable', 'false');
+                    draggable.classList.remove('cursor-grab');
+                    draggable.classList.add('cursor-default');
+                    
+                    // Visual feedback
+                    draggable.classList.add('bg-green-100', 'border-green-400');
+                    zone.classList.add('bg-green-50', 'border-green-200');
+                    
+                    playSound('success');
+                    speak("Benar! " + itemName + " awalan " + targetType);
+                    updateScore(1);
+                } else {
+                    // Wrong!
+                    draggable.classList.add('bg-red-100');
+                    setTimeout(() => draggable.classList.remove('bg-red-100'), 500);
+                    // Shake animation
+                    draggable.style.transform = "translateX(10px)";
+                    setTimeout(() => draggable.style.transform = "translateX(0)", 100);
+                    
+                    playSound('error');
+                    speak("Ups, coba lagi ya");
+                }
+            });
+        });
+
+        // --- GAME 2: CONNECT LINES ---
+        const svg = document.getElementById('svg-lines');
+        const currentLine = document.getElementById('current-line');
+        const matchPoints = document.querySelectorAll('.match-point');
+        let startPoint = null;
+        let isDrawing = false;
+
+        function getCenter(element) {
+            const rect = element.getBoundingClientRect();
+            const containerRect = document.getElementById('match-area').getBoundingClientRect();
+            return {
+                x: rect.left + rect.width / 2 - containerRect.left,
+                y: rect.top + rect.height / 2 - containerRect.top
+            };
+        }
+
+        matchPoints.forEach(point => {
+            point.addEventListener('mousedown', (e) => {
+                if (point.classList.contains('matched')) return;
+                
+                startPoint = point;
+                isDrawing = true;
+                const center = getCenter(point);
+                
+                currentLine.setAttribute('x1', center.x);
+                currentLine.setAttribute('y1', center.y);
+                currentLine.setAttribute('x2', center.x);
+                currentLine.setAttribute('y2', center.y);
+                currentLine.style.display = 'block';
+                
+                point.style.backgroundColor = '#F59E0B'; 
+                
+                // Audio hint
+                if(point.dataset.speak) {
+                    speak(point.dataset.speak);
+                }
+            });
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            
+            const containerRect = document.getElementById('match-area').getBoundingClientRect();
+            const x = e.clientX - containerRect.left;
+            const y = e.clientY - containerRect.top;
+            
+            currentLine.setAttribute('x2', x);
+            currentLine.setAttribute('y2', y);
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (!isDrawing) return;
+            isDrawing = false;
+            currentLine.style.display = 'none';
+
+            const target = document.elementFromPoint(e.clientX, e.clientY);
+            
+            if (target && target.classList.contains('match-point')) {
+                if (startPoint !== target && startPoint.dataset.type !== target.dataset.type) {
+                    if (startPoint.dataset.val === target.dataset.val) {
+                        // Match!
+                        createPermanentLine(startPoint, target, '#22C55E'); 
+                        startPoint.classList.add('matched');
+                        target.classList.add('matched');
+                        startPoint.style.backgroundColor = '#22C55E';
+                        target.style.backgroundColor = '#22C55E';
+                        
+                        playSound('success');
+                        speak("Hebat! Jawabannya benar.");
+                        updateScore(1);
+                    } else {
+                        // Wrong
+                        startPoint.style.backgroundColor = '#3B82F6'; 
+                        playSound('error');
+                        speak("Kurang tepat.");
+                    }
+                } else {
+                     startPoint.style.backgroundColor = '#3B82F6';
+                }
+            } else {
+                if(startPoint) startPoint.style.backgroundColor = '#3B82F6';
+            }
+            startPoint = null;
+        });
+
+        function createPermanentLine(p1, p2, color) {
+            const c1 = getCenter(p1);
+            const c2 = getCenter(p2);
+            
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', c1.x);
+            line.setAttribute('y1', c1.y);
+            line.setAttribute('x2', c2.x);
+            line.setAttribute('y2', c2.y);
+            line.setAttribute('stroke', color);
+            line.setAttribute('stroke-width', '5');
+            line.setAttribute('stroke-linecap', 'round');
+            svg.insertBefore(line, currentLine);
+        }
+
+        // Touch support (Basic Click-to-Connect)
+        let touchStartPoint = null;
+        matchPoints.forEach(point => {
+             point.addEventListener('click', (e) => {
+                 if (point.classList.contains('matched')) return;
+                 // Prevent double firing with mouse events if needed, but click works for both usually
+                 
+                 if (!touchStartPoint) {
+                     touchStartPoint = point;
+                     point.style.backgroundColor = '#F59E0B'; 
+                     if(point.dataset.speak) speak(point.dataset.speak);
+                 } else {
+                     if (touchStartPoint !== point && touchStartPoint.dataset.type !== point.dataset.type) {
+                         if (touchStartPoint.dataset.val === point.dataset.val) {
+                            createPermanentLine(touchStartPoint, point, '#22C55E');
+                            touchStartPoint.classList.add('matched');
+                            point.classList.add('matched');
+                            touchStartPoint.style.backgroundColor = '#22C55E';
+                            point.style.backgroundColor = '#22C55E';
+                            
+                            playSound('success');
+                            speak("Benar!");
+                            updateScore(1);
+                         } else {
+                            touchStartPoint.style.backgroundColor = '#3B82F6';
+                            playSound('error');
+                            speak("Coba lagi ya");
+                         }
+                     } else {
+                         touchStartPoint.style.backgroundColor = '#3B82F6';
+                     }
+                     touchStartPoint = null;
+                 }
+             });
+        });
+
+    </script>
+</body>
+</html>
