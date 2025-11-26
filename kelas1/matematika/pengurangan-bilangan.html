@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belajar Pengurangan Kelas 1 SD</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Font & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: #ecfeff; /* Cyan-50 */
+            background-image: radial-gradient(#a5f3fc 2px, transparent 2px);
+            background-size: 24px 24px;
+            user-select: none;
+        }
+        
+        .font-comic { font-family: 'Comic Neue', cursive; }
+
+        /* Custom Animations */
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide-up { animation: slideUp 0.5s ease-out forwards; }
+
+        @keyframes crossOut {
+            0% { width: 0; opacity: 0; }
+            100% { width: 100%; opacity: 1; }
+        }
+        .animate-cross { animation: crossOut 0.3s ease-in forwards; }
+
+        /* Numpad Button Styling */
+        .numpad-btn {
+            background: white;
+            border-bottom: 4px solid #cbd5e1;
+            transition: all 0.1s;
+        }
+        .numpad-btn:active {
+            transform: translateY(4px);
+            border-bottom: 0px solid transparent;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <div id="root" class="flex-grow"></div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t-4 border-cyan-400 py-4 mt-auto">
+        <div class="container mx-auto text-center">
+            <p class="text-gray-600 text-sm md:text-base font-bold">
+                Dibuat oleh <span class="text-cyan-600">Abdul Salim Owner folderosn.com</span>
+            </p>
+            <a href="https://pakabdulsalim.blogspot.com/" target="_blank" class="inline-block mt-1 text-blue-500 hover:text-blue-700 font-bold hover:underline transition-all text-sm">
+                Kunjungi: https://pakabdulsalim.blogspot.com
+            </a>
+        </div>
+    </footer>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- 1. ASSETS (SVG ICONS - DIPERBANYAK) ---
+        const Icons = {
+            Apple: ({ color, crossed }) => (
+                <div className="relative w-12 h-12 md:w-16 md:h-16 m-1 md:m-2 inline-block transition-transform hover:scale-110">
+                    <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
+                        <path d="M50 20 Q 65 5 80 20 Q 95 35 85 65 Q 75 95 50 90 Q 25 95 15 65 Q 5 35 20 20 Q 35 5 50 20" fill={color} />
+                        <path d="M50 20 Q 50 5 55 10" stroke="#4a7c59" strokeWidth="4" fill="none" />
+                    </svg>
+                    {crossed && <CrossMark />}
+                </div>
+            ),
+            Car: ({ color, crossed }) => (
+                <div className="relative w-12 h-12 md:w-16 md:h-16 m-1 md:m-2 inline-block transition-transform hover:scale-110">
+                    <svg viewBox="0 0 100 60" className="w-full h-full drop-shadow-sm mt-2">
+                        <path d="M10 35 L20 15 L75 15 L85 35 L90 35 Q 95 35 95 45 L95 50 L5 50 L5 45 Q 5 35 10 35 Z" fill={color} />
+                        <circle cx="25" cy="50" r="8" fill="#333" />
+                        <circle cx="75" cy="50" r="8" fill="#333" />
+                    </svg>
+                    {crossed && <CrossMark style={{marginTop: '-8px'}} />}
+                </div>
+            ),
+            Star: ({ color, crossed }) => (
+                <div className="relative w-12 h-12 md:w-16 md:h-16 m-1 md:m-2 inline-block transition-transform hover:scale-110">
+                    <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
+                        <polygon points="50,5 61,35 95,35 68,55 79,90 50,70 21,90 32,55 5,35 39,35" fill={color} stroke="#eab308" strokeWidth="2" />
+                    </svg>
+                    {crossed && <CrossMark />}
+                </div>
+            ),
+            Duck: ({ color, crossed }) => (
+                <div className="relative w-12 h-12 md:w-16 md:h-16 m-1 md:m-2 inline-block transition-transform hover:scale-110">
+                    <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
+                        <path d="M30 60 Q 10 60 10 40 Q 10 10 40 10 Q 70 10 70 40 L 90 50 L 70 60 Q 70 90 30 90 Q 30 60 30 60" fill={color} />
+                        <circle cx="55" cy="30" r="4" fill="black" />
+                        <path d="M70 40 L 85 45 L 70 50" fill="orange" />
+                    </svg>
+                    {crossed && <CrossMark />}
+                </div>
+            ),
+            Ball: ({ color, crossed }) => (
+                <div className="relative w-12 h-12 md:w-16 md:h-16 m-1 md:m-2 inline-block transition-transform hover:scale-110">
+                    <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
+                        <circle cx="50" cy="50" r="45" fill={color} />
+                        <path d="M5 50 Q 50 20 95 50" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="4" />
+                    </svg>
+                    {crossed && <CrossMark />}
+                </div>
+            ),
+            Flower: ({ color, crossed }) => (
+                <div className="relative w-12 h-12 md:w-16 md:h-16 m-1 md:m-2 inline-block transition-transform hover:scale-110">
+                    <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
+                        <circle cx="30" cy="30" r="15" fill={color} />
+                        <circle cx="70" cy="30" r="15" fill={color} />
+                        <circle cx="30" cy="70" r="15" fill={color} />
+                        <circle cx="70" cy="70" r="15" fill={color} />
+                        <circle cx="50" cy="50" r="20" fill="#facc15" />
+                    </svg>
+                    {crossed && <CrossMark />}
+                </div>
+            ),
+            Candy: ({ color, crossed }) => (
+                <div className="relative w-12 h-12 md:w-16 md:h-16 m-1 md:m-2 inline-block transition-transform hover:scale-110">
+                    <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
+                        <circle cx="50" cy="50" r="30" fill={color} stroke="rgba(0,0,0,0.1)" strokeWidth="2" />
+                        <path d="M20 20 L40 40 M60 60 L80 80" stroke={color} strokeWidth="10" strokeLinecap="round" />
+                    </svg>
+                    {crossed && <CrossMark />}
+                </div>
+            ),
+            Balloon: ({ color, crossed }) => (
+                <div className="relative w-12 h-12 md:w-16 md:h-16 m-1 md:m-2 inline-block transition-transform hover:scale-110">
+                    <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
+                        <line x1="50" y1="80" x2="50" y2="95" stroke="#999" strokeWidth="2" />
+                        <ellipse cx="50" cy="45" rx="35" ry="40" fill={color} />
+                        <polygon points="50,85 45,90 55,90" fill={color} />
+                    </svg>
+                    {crossed && <CrossMark />}
+                </div>
+            ),
+            Fish: ({ color, crossed }) => (
+                <div className="relative w-12 h-12 md:w-16 md:h-16 m-1 md:m-2 inline-block transition-transform hover:scale-110">
+                    <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
+                        <path d="M80 50 L95 35 L95 65 Z" fill={color} />
+                        <ellipse cx="50" cy="50" rx="40" ry="25" fill={color} />
+                        <circle cx="30" cy="45" r="3" fill="black" />
+                    </svg>
+                    {crossed && <CrossMark />}
+                </div>
+            )
+        };
+
+        // Reusable Cross Component
+        const CrossMark = ({ style }) => (
+            <div className="absolute inset-0 flex items-center justify-center" style={style}>
+                <div className="w-[120%] h-2 bg-red-600 absolute rotate-45 rounded shadow-sm animate-pop box-shadow-md"></div>
+                <div className="w-[120%] h-2 bg-red-600 absolute -rotate-45 rounded shadow-sm animate-pop box-shadow-md"></div>
+            </div>
+        );
+
+        // --- 2. HELPER: TTS ---
+        const speak = (text) => {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID';
+                utterance.rate = 0.9; 
+                window.speechSynthesis.speak(utterance);
+            }
+        };
+
+        // --- 3. LOGIC: QUESTION GENERATOR (RANDOMIZER) ---
+        const OBJECT_TYPES = [
+            { key: 'Apple', name: 'apel' },
+            { key: 'Car', name: 'mobil' },
+            { key: 'Star', name: 'bintang' },
+            { key: 'Duck', name: 'bebek' },
+            { key: 'Ball', name: 'bola' },
+            { key: 'Flower', name: 'bunga' },
+            { key: 'Candy', name: 'permen' },
+            { key: 'Balloon', name: 'balon' },
+            { key: 'Fish', name: 'ikan' }
+        ];
+
+        const COLORS = ["#ef4444", "#3b82f6", "#22c55e", "#eab308", "#a855f7", "#f97316", "#ec4899", "#06b6d4"];
+
+        const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+        // Fungsi utama membuat soal acak
+        const generateQuestions = () => {
+            let quests = [];
+
+            // 5 Soal Tipe 1 (Gambar Dicoret / Sisa)
+            for (let i = 0; i < 5; i++) {
+                const obj = getRandom(OBJECT_TYPES);
+                const color = getRandom(COLORS);
+                const total = getRandomInt(3, 10); // Minimal 3 agar visual coret jelas
+                const crossed = getRandomInt(1, total - 1); // Sisakan minimal 1
+                const answer = total - crossed;
+
+                quests.push({
+                    id: i + 1,
+                    type: 'visual_cross',
+                    objKey: obj.key,
+                    objName: obj.name,
+                    color: color,
+                    total: total,
+                    crossed: crossed,
+                    answer: answer,
+                    text: `Ada ${total} ${obj.name}. ${crossed} dicoret. Berapa sisanya?`
+                });
+            }
+
+            // 5 Soal Tipe 2 (Kalimat Matematika dengan visual)
+            for (let i = 0; i < 5; i++) {
+                const obj = getRandom(OBJECT_TYPES);
+                const color = getRandom(COLORS);
+                const total = getRandomInt(2, 10);
+                const minus = getRandomInt(1, total); // Bisa habis (0)
+                const answer = total - minus;
+
+                quests.push({
+                    id: i + 6,
+                    type: 'equation',
+                    objKey: obj.key,
+                    objName: obj.name,
+                    color: color,
+                    total: total,
+                    minus: minus,
+                    answer: answer,
+                    text: `Hitung hasil dari ${total} dikurang ${minus}.`
+                });
+            }
+
+            // Opsional: Acak urutan soal jika ingin tipe 1 & 2 bercampur
+            // quests.sort(() => Math.random() - 0.5); 
+            // (Saat ini dibiarkan berurutan agar belajar bertahap: Visual -> Abstrak)
+
+            return quests;
+        };
+
+        // --- 4. COMPONENT: APP ---
+        const App = () => {
+            const [gameState, setGameState] = useState('start'); // start, playing, finished
+            const [questions, setQuestions] = useState([]);
+            const [qIndex, setQIndex] = useState(0);
+            const [feedback, setFeedback] = useState(null); // correct, wrong
+
+            // Generate initial questions
+            useEffect(() => {
+                setQuestions(generateQuestions());
+            }, []);
+
+            const currentQ = questions[qIndex];
+
+            // TTS logic
+            useEffect(() => {
+                if (gameState === 'playing' && currentQ) {
+                    speak(currentQ.text);
+                }
+            }, [qIndex, gameState, currentQ]); // Add currentQ dependency
+
+            const handleStart = () => {
+                const newQuestions = generateQuestions(); // BUAT SOAL BARU
+                setQuestions(newQuestions);
+                setQIndex(0);
+                setFeedback(null);
+                setGameState('playing');
+                speak("Ayo belajar pengurangan!");
+            };
+
+            const handleAnswer = (num) => {
+                if (feedback) return; 
+
+                if (num === currentQ.answer) {
+                    setFeedback('correct');
+                    speak("Hebat! Benar.");
+                    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+
+                    setTimeout(() => {
+                        setFeedback(null);
+                        if (qIndex < 9) {
+                            setQIndex(qIndex + 1);
+                        } else {
+                            setGameState('finished');
+                            speak("Luar biasa! Kamu sudah menyelesaikan semua soal.");
+                        }
+                    }, 1500);
+                } else {
+                    setFeedback('wrong');
+                    speak("Coba hitung lagi ya.");
+                    setTimeout(() => setFeedback(null), 1000);
+                }
+            };
+
+            const IconComp = currentQ ? Icons[currentQ.objKey] : null;
+
+            // --- RENDER: START SCREEN ---
+            if (gameState === 'start') {
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center relative overflow-hidden">
+                        <div className="absolute top-10 left-10 text-6xl animate-bounce opacity-50">🍎</div>
+                        <div className="absolute bottom-20 right-10 text-6xl animate-bounce opacity-50" style={{animationDelay: '0.5s'}}>⭐</div>
+                        <div className="absolute top-20 right-20 text-6xl animate-bounce opacity-50" style={{animationDelay: '0.8s'}}>🚗</div>
+                        
+                        <h1 className="text-5xl md:text-6xl font-bold text-cyan-600 mb-6 font-comic drop-shadow-md">
+                            Belajar Pengurangan
+                        </h1>
+                        <p className="text-xl text-gray-600 mb-8 max-w-md">
+                            Setiap kali bermain, soal dan gambarnya akan selalu baru!
+                        </p>
+                        <button 
+                            onClick={handleStart}
+                            className="bg-orange-500 hover:bg-orange-600 text-white text-2xl font-bold py-4 px-12 rounded-full shadow-2xl transform transition hover:scale-105 active:scale-95 border-b-8 border-orange-700"
+                        >
+                            MULAI BELAJAR
+                        </button>
+                    </div>
+                );
+            }
+
+            // --- RENDER: FINISHED SCREEN ---
+            if (gameState === 'finished') {
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center bg-yellow-50">
+                        <div className="text-9xl mb-6 animate-bounce">🏆</div>
+                        <h1 className="text-5xl font-bold text-orange-600 mb-4 font-comic">Selesai!</h1>
+                        <p className="text-2xl text-gray-600 mb-8">Kamu pintar sekali!</p>
+                        <button 
+                            onClick={handleStart}
+                            className="bg-cyan-500 hover:bg-cyan-600 text-white text-xl font-bold py-3 px-10 rounded-full shadow-lg transform transition hover:scale-105 border-b-8 border-cyan-700"
+                        >
+                            Main Lagi (Soal Baru)
+                        </button>
+                    </div>
+                );
+            }
+
+            // --- RENDER: PLAYING SCREEN ---
+            return (
+                <div className="min-h-screen flex flex-col items-center py-4 px-2 md:px-4 w-full max-w-2xl mx-auto">
+                    
+                    {/* Header Info */}
+                    <div className="w-full flex justify-between items-center mb-4">
+                        <button onClick={() => setGameState('start')} className="text-gray-400 hover:text-gray-600 bg-white p-2 rounded-lg shadow">
+                            <i className="fa-solid fa-house text-xl"></i>
+                        </button>
+                        <div className="bg-white px-6 py-2 rounded-full shadow border-2 border-cyan-200">
+                            <span className="font-bold text-cyan-600">Soal {qIndex + 1} / 10</span>
+                        </div>
+                        <button onClick={() => speak(currentQ.text)} className="text-cyan-500 hover:text-cyan-700 bg-white p-2 rounded-full shadow">
+                            <i className="fa-solid fa-volume-high text-xl"></i>
+                        </button>
+                    </div>
+
+                    {/* Question Card */}
+                    <div className="bg-white rounded-3xl shadow-xl border-b-8 border-cyan-200 w-full p-4 md:p-8 mb-6 animate-slide-up relative overflow-hidden">
+                        
+                        {/* Question Text */}
+                        <div className="text-center mb-6">
+                            <h2 className="text-xl md:text-2xl font-bold text-gray-700">
+                                {currentQ.type === 'visual_cross' ? 'Berapa sisanya?' : 'Berapa hasilnya?'}
+                            </h2>
+                        </div>
+
+                        {/* Visual Area */}
+                        <div className="flex justify-center items-center flex-wrap gap-2 mb-8 min-h-[120px]">
+                            {currentQ.type === 'visual_cross' ? (
+                                // Tipe 1: Tampilkan Semua, Coret Sebagian
+                                [...Array(currentQ.total)].map((_, i) => (
+                                    <div key={i} className="animate-pop" style={{animationDelay: `${i*0.1}s`}}>
+                                        <IconComp 
+                                            color={currentQ.color} 
+                                            crossed={i >= (currentQ.total - currentQ.crossed)} // Coret dari belakang
+                                        />
+                                    </div>
+                                ))
+                            ) : (
+                                // Tipe 2: Tampilkan Semua (tanpa coret) sebagai visualisasi angka pertama
+                                [...Array(currentQ.total)].map((_, i) => (
+                                    <div key={i} className="animate-pop" style={{animationDelay: `${i*0.1}s`}}>
+                                        <IconComp color={currentQ.color} crossed={false} />
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        {/* Equation Display */}
+                        <div className="flex justify-center items-center gap-4 text-4xl md:text-6xl font-bold text-cyan-700 font-comic mb-4 bg-cyan-50 p-4 rounded-2xl border-2 border-cyan-100 border-dashed">
+                            {currentQ.type === 'visual_cross' ? (
+                                <>
+                                    <span>{currentQ.total}</span>
+                                    <span className="text-red-500">-</span>
+                                    <span className="text-red-500">{currentQ.crossed}</span>
+                                    <span>=</span>
+                                    <span className="text-orange-500">?</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span>{currentQ.total}</span>
+                                    <span>-</span>
+                                    <span>{currentQ.minus}</span>
+                                    <span>=</span>
+                                    <span className="text-orange-500">?</span>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Feedback Overlay */}
+                        {feedback === 'correct' && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-20">
+                                <div className="text-center animate-pop">
+                                    <div className="text-8xl mb-2">✨</div>
+                                    <h2 className="text-4xl font-bold text-green-500 font-comic">BENAR!</h2>
+                                </div>
+                            </div>
+                        )}
+                        {feedback === 'wrong' && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-20">
+                                <div className="bg-red-100 px-8 py-6 rounded-2xl border-4 border-red-300 text-center shadow-xl animate-pop">
+                                    <div className="text-5xl mb-2">🤔</div>
+                                    <h2 className="text-2xl font-bold text-red-500">Coba Lagi Ya</h2>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Numpad Input */}
+                    <div className="w-full max-w-md grid grid-cols-5 gap-3">
+                        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                            <button 
+                                key={num}
+                                onClick={() => handleAnswer(num)}
+                                className="numpad-btn rounded-xl py-3 md:py-4 text-2xl md:text-3xl font-bold text-cyan-700 shadow-md hover:bg-cyan-50 active:bg-cyan-200"
+                            >
+                                {num}
+                            </button>
+                        ))}
+                    </div>
+
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
