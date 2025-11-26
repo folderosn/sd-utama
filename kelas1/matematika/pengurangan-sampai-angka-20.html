@@ -3,40 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tarik Tambang Pengurangan - Kelas 1 SD</title>
-    
-    <!-- Tailwind CSS -->
+    <title>Tarik Tambang: Battle Math</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- React & ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    
-    <!-- Babel -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <!-- Font & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Varela+Round&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Confetti -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Varela Round', sans-serif;
-            background-color: #fffbeb; /* Light yellow tint for variety */
-            background-image: radial-gradient(#fcd34d 2px, transparent 2px);
-            background-size: 24px 24px;
-            overflow: hidden;
-            touch-action: none;
-            user-select: none;
+        :root {
+            --red-primary: #ff4757;
+            --red-shadow: #c41e30;
+            --blue-primary: #1e90ff;
+            --blue-shadow: #0c6dc9;
+            --bg-pattern: #f0f2f5;
         }
-        
-        .font-title { font-family: 'Fredoka', sans-serif; }
 
-        /* Rope Texture */
-        .rope {
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: var(--bg-pattern);
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow: hidden;
+        }
+
+        /* --- Rope & Arena Styles --- */
+        .arena-shadow {
+            box-shadow: 0 8px 0 rgba(0,0,0,0.1);
+        }
+
+        .rope-track {
+            background: #e2e8f0;
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .rope-texture {
             background: repeating-linear-gradient(
                 45deg,
                 #d97706,
@@ -44,460 +44,507 @@
                 #b45309 10px,
                 #b45309 20px
             );
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
 
-        /* Button Styles */
-        .answer-btn {
-            transition: all 0.1s;
-            border-bottom-width: 6px;
-        }
-        .answer-btn:active {
-            transform: translateY(4px);
-            border-bottom-width: 2px;
+        .center-marker {
+            background: repeating-linear-gradient(to bottom, #333 0, #333 4px, #fff 4px, #fff 8px);
         }
 
-        /* Animations */
-        @keyframes pop {
-            0% { transform: scale(0.5); opacity: 0; }
-            60% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); }
+        /* --- 3D Button Styles (Arcade Feel) --- */
+        .btn-3d {
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            top: 0;
         }
-        .animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
-        @keyframes pull-left {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(-30px); }
-            100% { transform: translateX(-10px); }
+        .btn-3d:active {
+            top: 6px; /* Efek ditekan */
+            box-shadow: 0 0 0 transparent !important; /* Hilangkan shadow bawah saat ditekan */
         }
-        @keyframes pull-right {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(30px); }
-            100% { transform: translateX(10px); }
+
+        .btn-red {
+            background-color: var(--red-primary);
+            box-shadow: 0 6px 0 var(--red-shadow);
+            color: white;
         }
         
-        .pull-anim-left { animation: pull-left 0.5s ease-in-out; }
-        .pull-anim-right { animation: pull-right 0.5s ease-in-out; }
-
-        /* Crossed out effect for subtraction visual */
-        .crossed-out {
-            position: relative;
-            opacity: 0.5;
+        .btn-blue {
+            background-color: var(--blue-primary);
+            box-shadow: 0 6px 0 var(--blue-shadow);
+            color: white;
         }
-        .crossed-out::after {
-            content: '✖';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: red;
-            font-size: 2rem;
-            font-weight: bold;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+
+        .btn-red.disabled, .btn-blue.disabled {
+            background-color: #94a3b8;
+            box-shadow: 0 6px 0 #64748b;
+            color: #e2e8f0;
+            pointer-events: none;
+            transform: scale(0.95);
+        }
+
+        /* --- Animations --- */
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        .visual-pop {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .math-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 0 #cbd5e1;
+            border: 2px solid #e2e8f0;
+        }
+
+        /* --- Layout Utilities --- */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 4px solid rgba(0,0,0,0.05);
+        }
+
+        /* Floating VS Badge */
+        .vs-badge {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
 
     </style>
 </head>
-<body class="flex flex-col h-screen">
-    <div id="root" class="flex-grow h-full"></div>
+<body class="h-screen flex flex-col">
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+    <!-- HEADER: Score & Rope -->
+    <header class="glass-panel z-30 p-2 md:p-4 shrink-0 relative">
+        <!-- Score Board -->
+        <div class="flex justify-between items-center max-w-5xl mx-auto mb-2 px-2">
+            <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border-2 border-red-100">
+                <div class="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center font-bold text-lg shadow-inner">M</div>
+                <span class="font-bold text-red-500 hidden md:block">TIM MERAH</span>
+            </div>
+            
+            <div class="vs-badge bg-yellow-400 text-yellow-900 font-black px-3 py-1 rounded-lg border-b-4 border-yellow-600 shadow-lg text-xl italic transform -skew-x-6">
+                VS
+            </div>
 
-        // --- 1. ASSETS: SVG ICONS ---
-        const Icons = {
-            Apple: ({ color }) => (
-                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
-                    <path d="M50 20 Q 65 5 80 20 Q 95 35 85 65 Q 75 95 50 90 Q 25 95 15 65 Q 5 35 20 20 Q 35 5 50 20" fill={color} />
-                    <path d="M50 20 Q 50 5 55 10" stroke="#4a7c59" strokeWidth="4" fill="none" />
-                </svg>
-            ),
-            Car: ({ color }) => (
-                <svg viewBox="0 0 100 60" className="w-full h-full drop-shadow-sm">
-                    <path d="M10 35 L20 15 L75 15 L85 35 L90 35 Q 95 35 95 45 L95 50 L5 50 L5 45 Q 5 35 10 35 Z" fill={color} />
-                    <circle cx="25" cy="50" r="8" fill="#333" />
-                    <circle cx="75" cy="50" r="8" fill="#333" />
-                </svg>
-            ),
-            Star: ({ color }) => (
-                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
-                    <polygon points="50,5 61,35 95,35 68,55 79,90 50,70 21,90 32,55 5,35 39,35" fill={color} stroke="rgba(0,0,0,0.1)" strokeWidth="2" />
-                </svg>
-            ),
-            Ball: ({ color }) => (
-                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
-                    <circle cx="50" cy="50" r="45" fill={color} />
-                    <path d="M5 50 Q 50 20 95 50" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="4" />
-                </svg>
-            ),
-            Cookie: ({ color }) => (
-                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
-                    <circle cx="50" cy="50" r="40" fill={color} />
-                    <circle cx="30" cy="40" r="5" fill="rgba(0,0,0,0.2)" />
-                    <circle cx="70" cy="30" r="5" fill="rgba(0,0,0,0.2)" />
-                    <circle cx="50" cy="70" r="5" fill="rgba(0,0,0,0.2)" />
-                </svg>
-            ),
-            Flower: ({ color }) => (
-                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
-                    <circle cx="30" cy="30" r="15" fill={color} />
-                    <circle cx="70" cy="30" r="15" fill={color} />
-                    <circle cx="30" cy="70" r="15" fill={color} />
-                    <circle cx="70" cy="70" r="15" fill={color} />
-                    <circle cx="50" cy="50" r="20" fill="#facc15" />
-                </svg>
-            )
+            <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border-2 border-blue-100 flex-row-reverse">
+                <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-lg shadow-inner">B</div>
+                <span class="font-bold text-blue-500 hidden md:block">TIM BIRU</span>
+            </div>
+        </div>
+
+        <!-- The Rope -->
+        <div class="relative w-full max-w-4xl mx-auto h-12 md:h-14 mt-2">
+            <!-- Track -->
+            <div class="absolute inset-y-0 w-full rope-track rounded-full overflow-hidden border-2 border-gray-300">
+                <div class="absolute top-0 bottom-0 left-0 w-1/2 bg-red-50/50 border-r-2 border-dashed border-red-200"></div>
+                <div class="absolute top-0 bottom-0 right-0 w-1/2 bg-blue-50/50"></div>
+                <!-- Center Line -->
+                <div class="absolute left-1/2 top-0 bottom-0 w-1 center-marker transform -translate-x-1/2 opacity-30"></div>
+            </div>
+            
+            <!-- Moving Knot -->
+            <div id="ropeKnot" class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-all duration-500 ease-out z-10" style="left: 50%;">
+                <!-- The Rope Visual -->
+                <div class="h-6 w-32 md:w-48 bg-amber-600 rounded-full rope-texture border-2 border-amber-800 relative flex items-center justify-center">
+                    <!-- The Knot Circle -->
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full border-4 border-amber-700 shadow-lg flex items-center justify-center text-xl relative">
+                        🚩
+                        <!-- Arrow indicator -->
+                        <div class="absolute -bottom-6 text-amber-700 font-bold text-xs bg-white px-2 py-0.5 rounded-full border border-amber-200 shadow-sm">PUSAT</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- QUESTION AREA -->
+    <section class="bg-white relative z-20 shrink-0 shadow-sm pb-4 pt-2">
+        
+        <!-- Audio Button -->
+        <button onclick="speakQuestion()" class="absolute top-2 right-4 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 p-2 rounded-xl transition shadow-sm border-b-4 border-yellow-200 active:border-b-0 active:translate-y-1" title="Baca Soal">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+            </svg>
+        </button>
+
+        <div class="text-center px-4">
+            <!-- Math Equation -->
+            <div class="flex justify-center items-center gap-2 md:gap-4 mb-3 scale-90 md:scale-100">
+                <div class="math-card w-16 h-20 md:w-20 md:h-24 flex items-center justify-center text-5xl md:text-6xl font-bold text-slate-700" id="numA">0</div>
+                <div class="text-4xl text-slate-400 font-black">-</div>
+                <div class="math-card w-16 h-20 md:w-20 md:h-24 flex items-center justify-center text-5xl md:text-6xl font-bold text-slate-400 opacity-60" id="numB">0</div>
+                <div class="text-4xl text-slate-400 font-black">=</div>
+                <div class="math-card w-16 h-20 md:w-20 md:h-24 flex items-center justify-center text-5xl md:text-6xl font-bold text-purple-600 bg-purple-50 border-purple-200">?</div>
+            </div>
+
+            <!-- Visual Objects Container -->
+            <div class="max-w-3xl mx-auto bg-slate-50 rounded-2xl border-2 border-dashed border-slate-300 p-2 min-h-[70px] flex flex-wrap justify-center items-center gap-1 md:gap-2 overflow-hidden transition-all" id="visualContainer">
+                <!-- Javascript will populate this -->
+            </div>
+            <p class="text-slate-400 text-xs md:text-sm mt-1 font-semibold">Hitung gambar yang terang!</p>
+        </div>
+    </section>
+
+    <!-- BATTLE CONTROLS AREA -->
+    <!-- Responsive: Flex-Col on Mobile (Top/Bottom), Flex-Row on Desktop (Left/Right) -->
+    <main class="flex-1 flex flex-col md:flex-row relative overflow-hidden">
+        
+        <!-- Feedback Overlay (Center) -->
+        <div id="roundFeedback" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none hidden w-full px-4">
+            <div class="bg-white/95 backdrop-blur-md px-8 py-6 rounded-3xl shadow-2xl border-b-8 text-center mx-auto max-w-sm animate-bounce" id="feedbackBox">
+                <span id="feedbackEmoji" class="text-6xl block mb-2"></span>
+                <span id="feedbackText" class="text-2xl font-black block uppercase tracking-wide"></span>
+            </div>
+        </div>
+
+        <!-- RED TEAM AREA -->
+        <div id="sideRed" class="flex-1 bg-red-50/50 p-3 md:p-6 flex flex-col justify-center border-b-4 md:border-b-0 md:border-r-4 border-red-100 relative">
+            <!-- Label Background -->
+            <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+                <span class="text-9xl font-black text-red-900">M</span>
+            </div>
+            
+            <div class="relative z-10 h-full flex flex-col justify-center gap-3 md:gap-6" id="optionsRed">
+                <!-- Buttons Generated by JS -->
+            </div>
+        </div>
+
+        <!-- BLUE TEAM AREA -->
+        <div id="sideBlue" class="flex-1 bg-blue-50/50 p-3 md:p-6 flex flex-col justify-center relative">
+            <!-- Label Background -->
+            <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+                <span class="text-9xl font-black text-blue-900">B</span>
+            </div>
+
+            <div class="relative z-10 h-full flex flex-col justify-center gap-3 md:gap-6" id="optionsBlue">
+                <!-- Buttons Generated by JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white/90 border-t border-slate-200 text-center py-2 text-xs md:text-sm text-slate-500 font-semibold z-40">
+        <p>
+            Dibuat Oleh <span class="text-slate-800">Abdul Salim</span>. Owner Folder OSN. 
+            <a href="https://pakabdulsalim.blogspot.com" target="_blank" class="text-blue-500 hover:text-blue-700 ml-1">pakabdulsalim.blogspot.com</a>
+        </p>
+    </footer>
+
+    <!-- START SCREEN OVERLAY -->
+    <div id="startOverlay" class="fixed inset-0 bg-gradient-to-br from-indigo-600 to-purple-700 z-50 flex flex-col items-center justify-center text-white p-6 text-center">
+        
+        <!-- Logo/Icon -->
+        <div class="flex items-center gap-4 mb-6 animate-pulse">
+            <div class="w-20 h-20 rounded-2xl bg-red-500 shadow-[0_8px_0_rgba(0,0,0,0.3)] flex items-center justify-center text-4xl border-4 border-white transform -rotate-6">🔴</div>
+            <div class="text-6xl font-black">VS</div>
+            <div class="w-20 h-20 rounded-2xl bg-blue-500 shadow-[0_8px_0_rgba(0,0,0,0.3)] flex items-center justify-center text-4xl border-4 border-white transform rotate-6">🔵</div>
+        </div>
+
+        <h1 class="text-5xl md:text-6xl font-black mb-2 tracking-tight drop-shadow-md">TARIK TAMBANG</h1>
+        <h2 class="text-2xl text-purple-200 font-bold mb-8">Edisi Matematika</h2>
+
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8 max-w-md w-full border border-white/20">
+            <h3 class="font-bold text-lg mb-4 text-purple-100 uppercase">Cara Main</h3>
+            <div class="grid grid-cols-2 gap-4 text-left">
+                <div class="bg-red-500/20 p-3 rounded-xl border border-red-400/50">
+                    <strong class="text-red-300 block text-sm">TIM MERAH</strong>
+                    <span class="text-sm">Jawab cepat untuk menarik ke Kiri!</span>
+                </div>
+                <div class="bg-blue-500/20 p-3 rounded-xl border border-blue-400/50">
+                    <strong class="text-blue-300 block text-sm">TIM BIRU</strong>
+                    <span class="text-sm">Jawab cepat untuk menarik ke Kanan!</span>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="startGame()" class="group relative inline-flex items-center justify-center px-8 py-4 font-black text-white transition-all duration-200 bg-yellow-400 font-lg rounded-full hover:bg-yellow-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 border-b-[6px] border-yellow-600 active:border-b-0 active:translate-y-2">
+            <span class="text-2xl text-yellow-900 uppercase tracking-wider">Mulai Main ▶</span>
+        </button>
+    </div>
+
+    <!-- WINNER SCREEN -->
+    <div id="resultScreen" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-[2rem] p-8 md:p-12 text-center max-w-lg w-full shadow-2xl border-8 border-yellow-400 transform scale-100 animate-[popIn_0.5s_ease-out]">
+            <div id="resultEmoji" class="text-9xl mb-6 block animate-bounce">🏆</div>
+            <h2 id="resultTitle" class="text-4xl md:text-5xl font-black mb-4 uppercase text-slate-800 leading-tight">MENANG!</h2>
+            <p id="resultMsg" class="text-xl text-slate-500 font-bold mb-8">Luar biasa!</p>
+            
+            <button onclick="resetGame()" class="w-full bg-indigo-500 hover:bg-indigo-400 text-white font-bold py-4 rounded-xl text-2xl shadow-[0_6px_0_#4338ca] active:shadow-none active:translate-y-[6px] transition-all">
+                Main Lagi ↺
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Game Config ---
+        const GAME_CONFIG = {
+            maxNumber: 20,
+            pullStrength: 15,
+            penaltyStrength: 5,
+            themes: ['🍎', '🍌', '🚗', '⭐', '🎈', '🐶', '🐱', '⚽', '🍪', '💎', '🚀', '🦖']
         };
 
-        // --- 2. GAME LOGIC ---
-        const OBJECT_TYPES = ['Apple', 'Car', 'Star', 'Ball', 'Cookie', 'Flower'];
-        const COLORS = ["#ef4444", "#3b82f6", "#22c55e", "#eab308", "#a855f7", "#f97316", "#ec4899"];
+        // --- Game State ---
+        let state = {
+            position: 50, // 0 to 100
+            numA: 0,
+            numB: 0,
+            answer: 0,
+            isLocked: false,
+            theme: '🍎'
+        };
 
-        const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
-        const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
-        const generateQuestions = (count = 5) => {
-            let quests = [];
-            for (let i = 0; i < count; i++) {
-                const type = getRandom(OBJECT_TYPES);
-                const color = getRandom(COLORS);
-                
-                // Generate numbers for Subtraction
-                // Start Number (Total) max 20, min 2
-                const numA = getRandomInt(2, 20);
-                // Subtract amount (must be <= numA)
-                const numB = getRandomInt(1, numA);
-                
-                const result = numA - numB;
-
-                // Generate Options (1 Correct, 2 Distractors)
-                const opts = new Set([result]);
-                while(opts.size < 3) {
-                    // Distractors close to result but not negative
-                    let distractor = getRandomInt(Math.max(0, result - 5), Math.min(20, result + 5));
-                    if (distractor !== result) opts.add(distractor);
+        // --- Audio System ---
+        const audioSys = {
+            synth: window.speechSynthesis,
+            voice: null,
+            init: function() {
+                if (speechSynthesis.onvoiceschanged !== undefined) {
+                    speechSynthesis.onvoiceschanged = () => this.loadVoice();
                 }
-
-                quests.push({
-                    id: i + 1,
-                    type,
-                    color,
-                    numA, // Total items displayed
-                    numB, // Items to cross out
-                    result,
-                    options: Array.from(opts).sort((a, b) => a - b)
-                });
-            }
-            return quests;
-        };
-
-        const speak = (text) => {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
+                this.loadVoice();
+            },
+            loadVoice: function() {
+                const voices = this.synth.getVoices();
+                this.voice = voices.find(v => v.lang.includes('id-ID') || v.lang === 'id_ID');
+            },
+            speak: function(text) {
+                if (this.synth.speaking) this.synth.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'id-ID';
-                utterance.rate = 0.9;
-                window.speechSynthesis.speak(utterance);
+                if(this.voice) utterance.voice = this.voice;
+                utterance.rate = 1.1;
+                utterance.pitch = 1.2;
+                this.synth.speak(utterance);
             }
         };
+        audioSys.init();
 
-        // --- 3. COMPONENTS ---
+        // --- Core Functions ---
 
-        const ObjectBox = ({ type, color, count, crossedCount }) => {
-            const Icon = Icons[type];
-            return (
-                <div className="bg-white/80 p-2 rounded-2xl border-4 border-orange-200 shadow-inner flex flex-wrap justify-center content-center gap-1 w-full min-h-[120px] md:min-h-[160px] overflow-hidden">
-                    {[...Array(count)].map((_, i) => {
-                        // Cross out the LAST 'crossedCount' items
-                        const isCrossed = i >= (count - crossedCount);
-                        return (
-                            <div 
-                                key={i} 
-                                className={`w-8 h-8 md:w-10 md:h-10 animate-pop transition-all ${isCrossed ? 'crossed-out grayscale scale-90' : ''}`} 
-                                style={{animationDelay: `${i * 0.05}s`}}
-                            >
-                                <Icon color={color} />
-                            </div>
-                        );
-                    })}
-                </div>
-            );
-        };
+        function startGame() {
+            document.getElementById('startOverlay').classList.add('hidden');
+            resetGame();
+            // Try to enable audio context on user interaction
+            audioSys.speak("Siap, mulai!");
+        }
 
-        const PlayerPanel = ({ side, score, options, onAnswer, disabled, isWinner }) => {
-            // Left = Green (Hijau) - Request says "Left Green"? No, prompt says "Warna Kiri Hijau, Kanan Kuning"
-            const isLeft = side === 'left';
+        function resetGame() {
+            state.position = 50;
+            updateRopeVisuals();
+            document.getElementById('resultScreen').classList.add('hidden');
+            generateQuestion();
+        }
+
+        function generateQuestion() {
+            state.isLocked = false;
             
-            // Colors based on prompt: Left=Green, Right=Yellow
-            const bgClass = isLeft ? 'bg-green-100 border-green-300' : 'bg-yellow-100 border-yellow-300';
-            const textClass = isLeft ? 'text-green-700' : 'text-yellow-700';
-            const btnClass = isLeft ? 'bg-green-500 border-green-700 hover:bg-green-600' : 'bg-yellow-500 border-yellow-700 hover:bg-yellow-600 text-white'; // Yellow text usually needs to be dark or button text white
+            // Reset UI States
+            document.getElementById('sideRed').classList.remove('opacity-50', 'pointer-events-none');
+            document.getElementById('sideBlue').classList.remove('opacity-50', 'pointer-events-none');
+            document.getElementById('roundFeedback').classList.add('hidden');
 
-            return (
-                <div className={`flex-1 flex flex-col p-2 md:p-4 border-r-4 border-white/50 relative ${isLeft ? 'items-start' : 'items-end'}`}>
-                    {/* Score Badge */}
-                    <div className={`absolute top-4 ${isLeft ? 'left-4' : 'right-4'} text-2xl font-black ${textClass} bg-white px-4 py-2 rounded-full shadow-lg border-2 ${isLeft ? 'border-green-200' : 'border-yellow-200'}`}>
-                        {score} <i className="fa-solid fa-star text-orange-400 ml-1"></i>
-                    </div>
+            // Math Logic (Subtractions > 0)
+            state.numA = Math.floor(Math.random() * (GAME_CONFIG.maxNumber - 5)) + 5; 
+            state.numB = Math.floor(Math.random() * (state.numA - 1)) + 1; 
+            state.answer = state.numA - state.numB;
+            state.theme = GAME_CONFIG.themes[Math.floor(Math.random() * GAME_CONFIG.themes.length)];
 
-                    {/* Team Label */}
-                    <h2 className={`mt-16 md:mt-12 text-2xl md:text-3xl font-black ${textClass} w-full text-center uppercase tracking-wider drop-shadow-sm bg-white/50 rounded-lg py-1`}>
-                        TIM {isLeft ? 'HIJAU' : 'KUNING'}
-                    </h2>
-
-                    {/* Options Grid */}
-                    <div className="flex-grow flex flex-col justify-center w-full max-w-md mx-auto gap-4 mt-4">
-                        {options.map((opt, idx) => (
-                            <button 
-                                key={idx}
-                                onClick={() => onAnswer(side, opt)}
-                                disabled={disabled}
-                                className={`answer-btn w-full py-4 md:py-6 rounded-2xl text-3xl md:text-5xl font-black text-white shadow-lg border-b-[6px] transform transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${btnClass}`}
-                            >
-                                {opt}
-                            </button>
-                        ))}
-                    </div>
-                    
-                    {isWinner && (
-                        <div className="absolute inset-0 bg-white/80 z-50 flex items-center justify-center animate-pop rounded-xl">
-                            <div className="text-center">
-                                <div className="text-6xl mb-2">🏆</div>
-                                <div className={`text-4xl font-black ${textClass}`}>MENANG!</div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
-        };
-
-        // --- 4. MAIN APP ---
-        const App = () => {
-            const [screen, setScreen] = useState('start');
-            const [questions, setQuestions] = useState([]);
-            const [qIndex, setQIndex] = useState(0);
+            renderUI();
             
-            // Game State
-            const [ropePosition, setRopePosition] = useState(50); // 0 to 100
-            const [scores, setScores] = useState({ left: 0, right: 0 });
-            const [roundWinner, setRoundWinner] = useState(null);
-            const [gameWinner, setGameWinner] = useState(null);
+            // Speak delay
+            setTimeout(() => audioSys.speak(`${state.numA} dikurang ${state.numB}`), 400);
+        }
 
-            useEffect(() => {
-                window.speechSynthesis.getVoices();
-                setQuestions(generateQuestions());
-            }, []);
+        function renderUI() {
+            document.getElementById('numA').textContent = state.numA;
+            document.getElementById('numB').textContent = state.numB;
+            
+            // Visuals
+            const container = document.getElementById('visualContainer');
+            container.innerHTML = '';
+            
+            const numBright = state.numA - state.numB;
+            const numFaded = state.numB;
+            const fragment = document.createDocumentFragment();
 
-            const currentQ = questions[qIndex];
+            for(let i=0; i<numBright; i++) {
+                const el = document.createElement('div');
+                el.className = 'text-3xl md:text-4xl visual-pop select-none filter drop-shadow-sm';
+                el.style.animationDelay = `${i * 0.05}s`;
+                el.textContent = state.theme;
+                fragment.appendChild(el);
+            }
+            for(let i=0; i<numFaded; i++) {
+                const el = document.createElement('div');
+                el.className = 'text-3xl md:text-4xl visual-pop opacity-20 grayscale scale-90 select-none';
+                el.style.animationDelay = `${(numBright + i) * 0.05}s`;
+                el.textContent = state.theme;
+                fragment.appendChild(el);
+            }
+            container.appendChild(fragment);
 
-            // TTS when question appears
-            useEffect(() => {
-                if (screen === 'playing' && currentQ && !roundWinner) {
-                    setTimeout(() => {
-                        speak(`Berapa ${currentQ.numA} dikurang ${currentQ.numB}?`);
-                    }, 500);
-                }
-            }, [qIndex, screen, roundWinner]);
+            // Generate Options
+            const options = generateOptions(state.answer);
+            renderButtons(options, 'red');
+            renderButtons(options, 'blue');
+        }
 
-            const handleStart = () => {
-                speak("Siap? Mulai!");
-                setQuestions(generateQuestions(5));
-                setQIndex(0);
-                setScores({ left: 0, right: 0 });
-                setRopePosition(50);
-                setRoundWinner(null);
-                setGameWinner(null);
-                setScreen('playing');
-            };
-
-            const handleAnswer = (side, val) => {
-                if (roundWinner) return; 
-
-                if (val === currentQ.result) {
-                    // Correct
-                    setRoundWinner(side);
-                    setScores(prev => ({ ...prev, [side]: prev[side] + 1 }));
-                    
-                    // Move Rope
-                    const moveAmount = 10;
-                    const newPos = side === 'left' ? ropePosition - moveAmount : ropePosition + moveAmount;
-                    setRopePosition(newPos);
-
-                    speak(side === 'left' ? "Tim Hijau Benar!" : "Tim Kuning Benar!");
-                    confetti({
-                        particleCount: 50,
-                        spread: 60,
-                        origin: { x: side === 'left' ? 0.25 : 0.75, y: 0.6 },
-                        colors: side === 'left' ? ['#22c55e', '#86efac'] : ['#eab308', '#fde047']
-                    });
-
-                    setTimeout(() => {
-                        if (qIndex < 4) {
-                            setQIndex(prev => prev + 1);
-                            setRoundWinner(null);
-                        } else {
-                            finishGame(newPos);
-                        }
-                    }, 2000);
+        function generateOptions(correct) {
+            let opts = [correct];
+            while(opts.length < 3) {
+                // Generate wrong answers close to correct one
+                let wrong = correct + Math.floor(Math.random() * 5) - 2;
+                if(wrong >= 0 && wrong <= 20 && !opts.includes(wrong)) {
+                    opts.push(wrong);
                 } else {
-                    speak("Salah!");
+                    // Fallback random
+                    let r = Math.floor(Math.random() * 20);
+                    if(!opts.includes(r)) opts.push(r);
                 }
-            };
+            }
+            return opts.sort(() => Math.random() - 0.5);
+        }
 
-            const finishGame = (finalPos) => {
-                let winner = 'draw';
-                if (finalPos < 50) winner = 'Tim Hijau';
-                if (finalPos > 50) winner = 'Tim Kuning';
+        function renderButtons(options, team) {
+            const container = document.getElementById(team === 'red' ? 'optionsRed' : 'optionsBlue');
+            container.innerHTML = '';
+            
+            options.forEach(val => {
+                const btn = document.createElement('button');
+                btn.className = `btn-3d w-full h-full rounded-2xl text-3xl md:text-4xl font-black py-4 md:py-0 ${team === 'red' ? 'btn-red' : 'btn-blue'}`;
+                btn.textContent = val;
                 
-                setGameWinner(winner);
-                setScreen('finish');
-                speak(`Permainan Selesai. Pemenangnya adalah ${winner}!`);
-                if (winner !== 'draw') {
-                    confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
-                }
-            };
+                // Interaction Handlers
+                const handler = (e) => {
+                    e.preventDefault();
+                    handleAnswer(team, val, btn);
+                };
+                
+                btn.addEventListener('mousedown', handler);
+                btn.addEventListener('touchstart', handler);
+                
+                container.appendChild(btn);
+            });
+        }
 
-            // START SCREEN
-            if (screen === 'start') {
-                return (
-                    <div className="h-full flex flex-col items-center justify-center p-4 text-center relative bg-orange-50">
-                        <h1 className="text-5xl md:text-7xl font-black text-orange-600 mb-6 font-title drop-shadow-xl tracking-wide">
-                            TARIK TAMBANG
-                        </h1>
-                        <h2 className="text-3xl md:text-4xl font-bold text-red-500 mb-10 font-title">
-                            Edisi Pengurangan
-                        </h2>
-                        
-                        <div className="flex items-center gap-8 mb-12 opacity-90">
-                            <div className="bg-green-500 text-white p-6 rounded-2xl shadow-lg transform -rotate-6 w-40">
-                                <i className="fa-solid fa-user text-4xl"></i>
-                                <p className="font-bold mt-2">Tim Hijau</p>
-                            </div>
-                            <div className="text-4xl font-black text-gray-400">VS</div>
-                            <div className="bg-yellow-500 text-white p-6 rounded-2xl shadow-lg transform rotate-6 w-40">
-                                <i className="fa-solid fa-user text-4xl"></i>
-                                <p className="font-bold mt-2">Tim Kuning</p>
-                            </div>
-                        </div>
+        function handleAnswer(team, val, btnEl) {
+            if(state.isLocked) return;
 
-                        <button onClick={handleStart} className="bg-blue-500 hover:bg-blue-600 text-white text-3xl font-black py-5 px-20 rounded-full shadow-[0_8px_0_rgb(30,64,175)] transform transition hover:scale-105 active:scale-95 active:shadow-none active:translate-y-2 flex items-center gap-4 border-4 border-blue-400">
-                            <i className="fa-solid fa-play"></i> MULAI
-                        </button>
-                    </div>
-                );
+            if(val === state.answer) {
+                // CORRECT
+                state.isLocked = true;
+                handleWinRound(team);
+                // Visual feedback on button
+                btnEl.textContent = "✔";
+            } else {
+                // WRONG
+                handleWrong(team, btnEl);
             }
+        }
 
-            // FINISH SCREEN
-            if (screen === 'finish') {
-                let WinnerImage = null;
-                // Simple placeholder icons for winners
-                if (gameWinner === 'Tim Hijau') {
-                    WinnerImage = <div className="text-8xl mb-4 animate-bounce">💚</div>;
-                } else if (gameWinner === 'Tim Kuning') {
-                    WinnerImage = <div className="text-8xl mb-4 animate-bounce">💛</div>;
-                }
-
-                return (
-                    <div className="h-full flex flex-col items-center justify-center p-4 text-center bg-blue-50">
-                        {WinnerImage || <div className="text-8xl mb-4">🤝</div>}
-                        
-                        <h1 className="text-6xl font-black text-blue-600 mb-4 font-title">SELESAI!</h1>
-                        <p className="text-4xl text-gray-700 mb-4 font-bold">
-                            {gameWinner === 'draw' ? "SERI!" : `Pemenang: ${gameWinner}`}
-                        </p>
-                        <div className="flex gap-8 mb-10 text-2xl font-bold text-gray-600">
-                            <span className="text-green-600">💚 {scores.left}</span>
-                            <span className="text-yellow-600">💛 {scores.right}</span>
-                        </div>
-                        <button onClick={handleStart} className="bg-orange-500 hover:bg-orange-600 text-white text-xl font-bold py-4 px-12 rounded-full shadow-[0_6px_0_rgb(194,65,12)] transform transition hover:scale-105 active:scale-95 active:shadow-none active:translate-y-2 flex items-center gap-3 border-4 border-orange-400">
-                            <i className="fa-solid fa-rotate-right"></i> Main Lagi
-                        </button>
-                        <div className="mt-12">
-                            <p className="text-gray-500 text-sm font-bold">
-                                Dibuat oleh <span className="text-blue-600">Abdul Salim Owner folderosn.com</span>
-                            </p>
-                            <a href="https://pakabdulsalim.blogspot.com/" target="_blank" className="text-blue-500 text-sm font-bold hover:underline">Kunjungi: https://pakabdulsalim.blogspot.com</a>
-                        </div>
-                    </div>
-                );
-            }
-
-            // PLAYING SCREEN
-            const isGreenTurn = true; // Both active simultaneously in this mode
-
-            return (
-                <div className="flex flex-col h-full bg-gray-50 overflow-hidden relative">
-                    
-                    {/* Top Bar: The Question */}
-                    <div className="absolute top-0 left-0 w-full h-1/3 bg-white z-10 shadow-xl flex flex-col items-center justify-center border-b-8 border-gray-200">
-                        <div className="text-gray-400 font-bold mb-1 uppercase tracking-widest text-sm">Soal {qIndex + 1} / 5</div>
-                        
-                        <div className="flex flex-col items-center w-full max-w-2xl px-4">
-                            {/* Visuals */}
-                            <ObjectBox type={currentQ.type} color={currentQ.color} count={currentQ.numA} crossedCount={currentQ.numB} />
-                            
-                            {/* Equation */}
-                            <div className="flex items-center gap-4 mt-2">
-                                <span className="text-5xl font-black text-gray-700">{currentQ.numA}</span>
-                                <i className="fa-solid fa-minus text-4xl text-red-400"></i>
-                                <span className="text-5xl font-black text-gray-700">{currentQ.numB}</span>
-                                <i className="fa-solid fa-equals text-4xl text-gray-400"></i>
-                                <span className="text-5xl font-black text-blue-500">?</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Middle: The Rope */}
-                    <div className="absolute top-1/3 left-0 w-full h-16 z-20 flex items-center pointer-events-none">
-                        <div className="w-full h-6 bg-orange-800 relative rounded-full mx-4 shadow-inner rope border-2 border-orange-900">
-                            {/* Center Marker */}
-                            <div className="absolute left-1/2 top-0 h-full w-2 bg-white/50 transform -translate-x-1/2"></div>
-                            
-                            {/* The Knot */}
-                            <div 
-                                className="absolute top-1/2 w-14 h-14 bg-red-600 rounded-full border-4 border-white shadow-xl transform -translate-y-1/2 -translate-x-1/2 transition-all duration-500 ease-out flex items-center justify-center"
-                                style={{ left: `${ropePosition}%` }}
-                            >
-                                <span className="text-white font-black text-xs">VS</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Bottom: Player Zones (Left Green, Right Yellow) */}
-                    <div className="flex-grow mt-[33vh] flex w-full h-2/3">
-                        
-                        {/* Left Player (Green) */}
-                        <div className="flex-1 bg-green-50 border-r-4 border-green-200 flex flex-col">
-                            <PlayerPanel 
-                                side="left" 
-                                score={scores.left} 
-                                options={currentQ.options} 
-                                onAnswer={handleAnswer}
-                                disabled={!!roundWinner}
-                                isWinner={roundWinner === 'left'}
-                            />
-                        </div>
-
-                        {/* Right Player (Yellow) */}
-                        <div className="flex-1 bg-yellow-50 border-l-4 border-yellow-200 flex flex-col">
-                            <PlayerPanel 
-                                side="right" 
-                                score={scores.right} 
-                                options={currentQ.options} 
-                                onAnswer={handleAnswer}
-                                disabled={!!roundWinner}
-                                isWinner={roundWinner === 'right'}
-                            />
-                        </div>
-
-                    </div>
-
-                </div>
+        function handleWinRound(team) {
+            const isRed = team === 'red';
+            state.position += isRed ? -GAME_CONFIG.pullStrength : GAME_CONFIG.pullStrength;
+            
+            audioSys.speak(isRed ? "Merah Benar!" : "Biru Benar!");
+            
+            showFeedback(
+                isRed ? "MERAH MAJU!" : "BIRU MAJU!", 
+                isRed ? "text-red-500" : "text-blue-500",
+                isRed ? "border-red-500" : "border-blue-500"
             );
-        };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+            updateRopeVisuals();
+            
+            if(!checkWinGame()) {
+                setTimeout(generateQuestion, 1200);
+            }
+        }
+
+        function handleWrong(team, btnEl) {
+            const isRed = team === 'red';
+            state.position += isRed ? GAME_CONFIG.penaltyStrength : -GAME_CONFIG.penaltyStrength;
+            
+            audioSys.speak("Ups, Salah!");
+            
+            // Visual Penalty
+            btnEl.classList.add('disabled');
+            const sideEl = document.getElementById(isRed ? 'sideRed' : 'sideBlue');
+            sideEl.classList.add('opacity-50', 'pointer-events-none');
+            
+            setTimeout(() => {
+                sideEl.classList.remove('opacity-50', 'pointer-events-none');
+            }, 1000);
+
+            updateRopeVisuals();
+            checkWinGame();
+        }
+
+        function showFeedback(text, colorClass, borderClass) {
+            const fb = document.getElementById('roundFeedback');
+            const box = document.getElementById('feedbackBox');
+            const txt = document.getElementById('feedbackText');
+            
+            txt.className = `text-2xl font-black block uppercase tracking-wide ${colorClass}`;
+            txt.textContent = text;
+            
+            box.className = `bg-white/95 backdrop-blur-md px-8 py-6 rounded-3xl shadow-2xl border-b-8 text-center mx-auto max-w-sm animate-bounce border-t-2 border-l-2 border-r-2 ${borderClass}`;
+            
+            document.getElementById('feedbackEmoji').textContent = "✨";
+            fb.classList.remove('hidden');
+        }
+
+        function updateRopeVisuals() {
+            // Clamp
+            if(state.position < 5) state.position = 5;
+            if(state.position > 95) state.position = 95;
+            
+            const knot = document.getElementById('ropeKnot');
+            knot.style.left = state.position + '%';
+        }
+
+        function checkWinGame() {
+            if(state.position <= 10) {
+                gameOver('red');
+                return true;
+            } else if (state.position >= 90) {
+                gameOver('blue');
+                return true;
+            }
+            return false;
+        }
+
+        function gameOver(winner) {
+            const screen = document.getElementById('resultScreen');
+            const title = document.getElementById('resultTitle');
+            const msg = document.getElementById('resultMsg');
+            const emoji = document.getElementById('resultEmoji');
+            
+            screen.classList.remove('hidden');
+            
+            if(winner === 'red') {
+                title.textContent = 'TIM MERAH MENANG!';
+                title.className = "text-4xl md:text-5xl font-black mb-4 uppercase text-red-500 leading-tight";
+                msg.textContent = "Kerja tim yang hebat!";
+                emoji.textContent = "🔴🏆";
+                audioSys.speak("Selamat! Tim Merah Menang!");
+            } else {
+                title.textContent = 'TIM BIRU MENANG!';
+                title.className = "text-4xl md:text-5xl font-black mb-4 uppercase text-blue-500 leading-tight";
+                msg.textContent = "Kecepatan luar biasa!";
+                emoji.textContent = "🔵🏆";
+                audioSys.speak("Selamat! Tim Biru Menang!");
+            }
+        }
     </script>
 </body>
 </html>
