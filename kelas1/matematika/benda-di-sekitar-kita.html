@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Benda di Sekitarku - Kelas 1 SD</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Font & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Varela+Round&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Varela Round', sans-serif;
+            background-color: #fdf4ff; /* Light Purple */
+            background-image: radial-gradient(#e879f9 2px, transparent 2px);
+            background-size: 24px 24px;
+            overflow: hidden;
+            touch-action: none; /* Prevent scroll on mobile drag */
+            user-select: none;
+        }
+        
+        .font-title { font-family: 'Fredoka', sans-serif; }
+
+        /* Animations */
+        @keyframes pop {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake { animation: shake 0.4s; }
+
+        /* Custom Cursor */
+        .drawing-cursor { cursor: crosshair; }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+    <div id="root" class="flex-grow h-full"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- 1. ASSETS: SVG OBJECTS & SHAPES ---
+        
+        const Objects = {
+            // Lingkaran Objects
+            Clock: () => (
+                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
+                    <circle cx="50" cy="50" r="45" fill="#fff" stroke="#333" strokeWidth="4"/>
+                    <circle cx="50" cy="50" r="3" fill="#333"/>
+                    <line x1="50" y1="50" x2="50" y2="20" stroke="#333" strokeWidth="3" strokeLinecap="round"/>
+                    <line x1="50" y1="50" x2="70" y2="50" stroke="#333" strokeWidth="3" strokeLinecap="round"/>
+                    <text x="50" y="18" textAnchor="middle" fontSize="12" fontFamily="Arial" fontWeight="bold" fill="#333">12</text>
+                    <text x="85" y="54" textAnchor="middle" fontSize="12" fontFamily="Arial" fontWeight="bold" fill="#333">3</text>
+                    <text x="50" y="90" textAnchor="middle" fontSize="12" fontFamily="Arial" fontWeight="bold" fill="#333">6</text>
+                    <text x="15" y="54" textAnchor="middle" fontSize="12" fontFamily="Arial" fontWeight="bold" fill="#333">9</text>
+                </svg>
+            ),
+            Wheel: () => (
+                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#1f2937" strokeWidth="12"/>
+                    <circle cx="50" cy="50" r="10" fill="#9ca3af"/>
+                    <line x1="50" y1="10" x2="50" y2="90" stroke="#4b5563" strokeWidth="4"/>
+                    <line x1="10" y1="50" x2="90" y2="50" stroke="#4b5563" strokeWidth="4"/>
+                </svg>
+            ),
+            Pizza: () => (
+                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
+                    <path d="M50 10 L90 90 L10 90 Z" fill="#facc15" stroke="#ca8a04" strokeWidth="3" strokeLinejoin="round"/>
+                    <path d="M50 10 L90 90 L10 90 Z" fill="#fef08a" transform="scale(0.8) translate(12,10)" />
+                    <circle cx="50" cy="60" r="6" fill="#ef4444"/>
+                    <circle cx="40" cy="80" r="6" fill="#ef4444"/>
+                    <circle cx="60" cy="80" r="6" fill="#ef4444"/>
+                </svg>
+            ),
+            Hanger: () => (
+                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
+                    <path d="M50 20 Q 50 5 60 5" fill="none" stroke="#9ca3af" strokeWidth="4" strokeLinecap="round"/>
+                    <path d="M50 20 L10 70 L90 70 Z" fill="none" stroke="#d97706" strokeWidth="6" strokeLinejoin="round"/>
+                    <line x1="15" y1="70" x2="85" y2="70" stroke="#d97706" strokeWidth="6"/>
+                </svg>
+            ),
+            Book: () => (
+                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
+                    <rect x="20" y="15" width="60" height="70" rx="2" fill="#3b82f6"/>
+                    <rect x="25" y="20" width="50" height="60" fill="#fff" opacity="0.3"/>
+                    <rect x="15" y="15" width="10" height="70" fill="#1d4ed8"/>
+                </svg>
+            ),
+            Door: () => (
+                <svg viewBox="0 0 60 100" className="w-full h-full drop-shadow-md">
+                    <rect x="5" y="5" width="50" height="90" fill="#78350f" stroke="#451a03" strokeWidth="3"/>
+                    <rect x="10" y="10" width="40" height="35" fill="#92400e"/>
+                    <rect x="10" y="50" width="40" height="40" fill="#92400e"/>
+                    <circle cx="45" cy="50" r="3" fill="#facc15"/>
+                </svg>
+            ),
+            Window: () => (
+                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
+                    <rect x="10" y="10" width="80" height="80" fill="#bae6fd" stroke="#1e3a8a" strokeWidth="6"/>
+                    <line x1="50" y1="10" x2="50" y2="90" stroke="#1e3a8a" strokeWidth="4"/>
+                    <line x1="10" y1="50" x2="90" y2="50" stroke="#1e3a8a" strokeWidth="4"/>
+                </svg>
+            ),
+            Dice: () => (
+                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
+                    <rect x="15" y="15" width="70" height="70" rx="10" fill="#fff" stroke="#333" strokeWidth="3"/>
+                    <circle cx="35" cy="35" r="6" fill="#333"/>
+                    <circle cx="65" cy="35" r="6" fill="#333"/>
+                    <circle cx="35" cy="65" r="6" fill="#333"/>
+                    <circle cx="65" cy="65" r="6" fill="#333"/>
+                </svg>
+            )
+        };
+
+        const Shapes = {
+            Lingkaran: () => <svg viewBox="0 0 100 100" className="w-full h-full"><circle cx="50" cy="50" r="40" fill="#4ade80" stroke="#166534" strokeWidth="3"/></svg>,
+            Segitiga: () => <svg viewBox="0 0 100 100" className="w-full h-full"><polygon points="50,10 90,90 10,90" fill="#facc15" stroke="#854d0e" strokeWidth="3" strokeLinejoin="round"/></svg>,
+            Persegi: () => <svg viewBox="0 0 100 100" className="w-full h-full"><rect x="15" y="15" width="70" height="70" rx="4" fill="#f472b6" stroke="#be185d" strokeWidth="3"/></svg>,
+            PersegiPanjang: () => <svg viewBox="0 0 100 100" className="w-full h-full"><rect x="10" y="25" width="80" height="50" rx="4" fill="#60a5fa" stroke="#1e40af" strokeWidth="3"/></svg>
+        };
+
+        // --- 2. DATA POOL ---
+        const POOL = [
+            { id: 'clk', type: 'Lingkaran', name: 'Jam', Comp: Objects.Clock },
+            { id: 'whl', type: 'Lingkaran', name: 'Roda', Comp: Objects.Wheel },
+            { id: 'piz', type: 'Segitiga', name: 'Pizza', Comp: Objects.Pizza },
+            { id: 'hgr', type: 'Segitiga', name: 'Gantungan', Comp: Objects.Hanger },
+            { id: 'bok', type: 'PersegiPanjang', name: 'Buku', Comp: Objects.Book },
+            { id: 'dor', type: 'PersegiPanjang', name: 'Pintu', Comp: Objects.Door },
+            { id: 'win', type: 'Persegi', name: 'Jendela', Comp: Objects.Window },
+            { id: 'dic', type: 'Persegi', name: 'Dadu', Comp: Objects.Dice }
+        ];
+
+        const TARGETS = [
+            { id: 't_cir', type: 'Lingkaran', name: 'Lingkaran', Comp: Shapes.Lingkaran },
+            { id: 't_tri', type: 'Segitiga', name: 'Segitiga', Comp: Shapes.Segitiga },
+            { id: 't_sqr', type: 'Persegi', name: 'Persegi', Comp: Shapes.Persegi },
+            { id: 't_rec', type: 'PersegiPanjang', name: 'Persegi Panjang', Comp: Shapes.PersegiPanjang }
+        ];
+
+        // --- 3. HELPER FUNCTIONS ---
+        const speak = (text) => {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID';
+                utterance.rate = 0.9; 
+                window.speechSynthesis.speak(utterance);
+            }
+        };
+
+        const getRandom = (arr, n) => {
+            const shuffled = [...arr].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, n);
+        };
+
+        // --- 4. MAIN APP COMPONENT ---
+        const App = () => {
+            const [levelItems, setLevelItems] = useState([]);
+            const [connections, setConnections] = useState([]); // { fromId, toId, color }
+            const [currentPath, setCurrentPath] = useState(null); // { x1, y1, x2, y2, fromId }
+            const [errorMsg, setErrorMsg] = useState(null);
+            const [isFinished, setIsFinished] = useState(false);
+            
+            const svgRef = useRef(null);
+            const leftDotsRef = useRef({});
+            const rightDotsRef = useRef({});
+
+            // Init Game
+            useEffect(() => {
+                startNewGame();
+            }, []);
+
+            const startNewGame = () => {
+                // Select 4 random unique shapes types for the Right side (Target)
+                // But we only have 4 shapes, so we take all 4 TARGETS.
+                // Then we pick 4 random Objects (Left side) that MATCH these 4 shapes.
+                
+                // 1. Prepare Targets (Right Side) - Fixed Order or Shuffled? Let's shuffle.
+                const shuffledTargets = [...TARGETS].sort(() => 0.5 - Math.random());
+                
+                // 2. Prepare Objects (Left Side) - Must have 1 matching object for each target
+                const selectedObjects = shuffledTargets.map(target => {
+                    // Find all objects that match this target type
+                    const candidates = POOL.filter(o => o.type === target.type);
+                    // Pick one random candidate
+                    return candidates[Math.floor(Math.random() * candidates.length)];
+                });
+
+                // Shuffle the Left Side so they don't align perfectly horizontally
+                const shuffledObjects = [...selectedObjects].sort(() => 0.5 - Math.random());
+
+                setLevelItems({ left: shuffledObjects, right: shuffledTargets });
+                setConnections([]);
+                setCurrentPath(null);
+                setIsFinished(false);
+                setErrorMsg(null);
+                speak("Hubungkan benda dengan bentuknya!");
+            };
+
+            const getRelPos = (e) => {
+                const rect = svgRef.current.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
+                };
+            };
+
+            const handleStartDraw = (id, side, e) => {
+                e.preventDefault(); // Prevent scroll on touch
+                if (isFinished) return;
+                
+                // Check if already connected
+                if (side === 'left' && connections.find(c => c.fromId === id)) return;
+                if (side === 'right') return; // Start drawing only from Left (Object) for simplicity, or check match. Let's allow Left->Right.
+
+                // Get start coordinates from the dot ref
+                const dot = leftDotsRef.current[id];
+                if (!dot) return;
+                const rect = dot.getBoundingClientRect();
+                const svgRect = svgRef.current.getBoundingClientRect();
+                
+                const startX = rect.left + rect.width / 2 - svgRect.left;
+                const startY = rect.top + rect.height / 2 - svgRect.top;
+
+                setCurrentPath({
+                    x1: startX,
+                    y1: startY,
+                    x2: startX,
+                    y2: startY,
+                    fromId: id
+                });
+                
+                speak("Tarik ke bentuknya");
+            };
+
+            const handleMoveDraw = (e) => {
+                if (!currentPath) return;
+                e.preventDefault();
+                const pos = getRelPos(e);
+                setCurrentPath(prev => ({ ...prev, x2: pos.x, y2: pos.y }));
+            };
+
+            const handleEndDraw = (e) => {
+                if (!currentPath) return;
+                
+                // Detect if dropped on a valid target dot
+                const pos = getRelPos(e); // For mouse up
+                // For touch, we need changedTouches, handled via generic handler or element detection
+                
+                // Check collision with Right Dots
+                let hitTargetId = null;
+                
+                // Iterate through right dots to see if mouse/touch is inside
+                Object.keys(rightDotsRef.current).forEach(targetId => {
+                    const dot = rightDotsRef.current[targetId];
+                    const rect = dot.getBoundingClientRect();
+                    
+                    // We use client coordinates for check
+                    const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+                    const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+
+                    // Expand hit area slightly
+                    if (
+                        clientX >= rect.left - 20 && clientX <= rect.right + 20 &&
+                        clientY >= rect.top - 20 && clientY <= rect.bottom + 20
+                    ) {
+                        hitTargetId = targetId;
+                    }
+                });
+
+                if (hitTargetId) {
+                    validateConnection(currentPath.fromId, hitTargetId);
+                } else {
+                    // Dropped in empty space
+                    setCurrentPath(null);
+                }
+            };
+
+            const validateConnection = (objId, targetId) => {
+                const obj = levelItems.left.find(o => o.id === objId);
+                const target = levelItems.right.find(t => t.id === targetId);
+
+                if (obj.type === target.type) {
+                    // Correct
+                    speak("Benar!");
+                    
+                    // Calculate exact end coordinates
+                    const dot = rightDotsRef.current[targetId];
+                    const rect = dot.getBoundingClientRect();
+                    const svgRect = svgRef.current.getBoundingClientRect();
+                    const endX = rect.left + rect.width / 2 - svgRect.left;
+                    const endY = rect.top + rect.height / 2 - svgRect.top;
+
+                    const newConn = {
+                        fromId: objId,
+                        toId: targetId,
+                        x1: currentPath.x1,
+                        y1: currentPath.y1,
+                        x2: endX,
+                        y2: endY,
+                        color: '#22c55e' // Green
+                    };
+
+                    const newConnections = [...connections, newConn];
+                    setConnections(newConnections);
+                    setCurrentPath(null);
+
+                    // Check Finish
+                    if (newConnections.length === 4) {
+                        setIsFinished(true);
+                        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                        speak("Luar biasa! Semua benar.");
+                    }
+                } else {
+                    // Wrong
+                    speak("Ups, salah.");
+                    setErrorMsg("Silahkan ulangi lagi dengan hati-hati ya");
+                    setCurrentPath(null);
+                    setTimeout(() => setErrorMsg(null), 2500);
+                }
+            };
+
+            return (
+                <div className="flex flex-col h-full relative bg-purple-50 overflow-hidden"
+                     onMouseMove={handleMoveDraw}
+                     onTouchMove={handleMoveDraw}
+                     onMouseUp={handleEndDraw}
+                     onTouchEnd={handleEndDraw}
+                >
+                    
+                    {/* Header */}
+                    <div className="bg-white p-4 shadow-md z-20 flex justify-between items-center">
+                        <h1 className="text-2xl md:text-3xl font-bold text-purple-600 font-title">Benda & Bentuk</h1>
+                        <button 
+                            onClick={startNewGame}
+                            className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-full font-bold shadow transition transform hover:scale-105"
+                        >
+                            <i className="fa-solid fa-rotate-right mr-2"></i> Reset
+                        </button>
+                    </div>
+
+                    {/* Game Area */}
+                    <div className="flex-grow relative flex items-center justify-center p-4">
+                        
+                        {/* SVG Overlay for Lines */}
+                        <svg 
+                            ref={svgRef}
+                            className="absolute inset-0 w-full h-full pointer-events-none z-10"
+                        >
+                            {connections.map((conn, i) => (
+                                <line 
+                                    key={i} 
+                                    x1={conn.x1} y1={conn.y1} 
+                                    x2={conn.x2} y2={conn.y2} 
+                                    stroke={conn.color} 
+                                    strokeWidth="6" 
+                                    strokeLinecap="round"
+                                />
+                            ))}
+                            {currentPath && (
+                                <line 
+                                    x1={currentPath.x1} y1={currentPath.y1} 
+                                    x2={currentPath.x2} y2={currentPath.y2} 
+                                    stroke="#d946ef" 
+                                    strokeWidth="6" 
+                                    strokeLinecap="round" 
+                                    strokeDasharray="10,10"
+                                />
+                            )}
+                        </svg>
+
+                        {/* Content Grid */}
+                        <div className="flex justify-between w-full max-w-4xl h-full py-4 gap-8 md:gap-20">
+                            
+                            {/* LEFT COLUMN: OBJECTS */}
+                            <div className="flex flex-col justify-around flex-1">
+                                {levelItems.left && levelItems.left.map(item => {
+                                    const isConnected = connections.find(c => c.fromId === item.id);
+                                    return (
+                                        <div key={item.id} className="flex items-center justify-end relative group h-24">
+                                            {/* Card */}
+                                            <div className="bg-white p-2 md:p-4 rounded-2xl shadow-lg border-4 border-purple-200 w-24 h-24 md:w-32 md:h-32 flex items-center justify-center transform transition hover:scale-105 select-none">
+                                                <item.Comp />
+                                            </div>
+                                            
+                                            {/* Dot Anchor */}
+                                            <div 
+                                                ref={el => leftDotsRef.current[item.id] = el}
+                                                className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-4 border-white shadow-md ml-[-15px] z-20 cursor-crosshair flex items-center justify-center transition-colors ${isConnected ? 'bg-green-500' : 'bg-purple-400 hover:bg-purple-600'}`}
+                                                style={{ marginRight: '-20px' }} // Pull dot closer
+                                                onMouseDown={(e) => handleStartDraw(item.id, 'left', e)}
+                                                onTouchStart={(e) => handleStartDraw(item.id, 'left', e)}
+                                            >
+                                                {isConnected && <i className="fa-solid fa-check text-white text-sm"></i>}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* RIGHT COLUMN: SHAPES */}
+                            <div className="flex flex-col justify-around flex-1">
+                                {levelItems.right && levelItems.right.map(item => {
+                                    const isConnected = connections.find(c => c.toId === item.id);
+                                    return (
+                                        <div key={item.id} className="flex items-center justify-start relative group h-24">
+                                            {/* Dot Anchor */}
+                                            <div 
+                                                ref={el => rightDotsRef.current[item.id] = el}
+                                                className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-4 border-white shadow-md mr-[-15px] z-20 transition-colors ${isConnected ? 'bg-green-500' : 'bg-gray-300'}`}
+                                                style={{ marginLeft: '-20px' }}
+                                            ></div>
+
+                                            {/* Card */}
+                                            <div className="bg-white p-2 md:p-4 rounded-2xl shadow-lg border-4 border-blue-200 w-24 h-24 md:w-32 md:h-32 flex flex-col items-center justify-center transform transition hover:scale-105 select-none">
+                                                <div className="w-16 h-16 mb-1">
+                                                    <item.Comp />
+                                                </div>
+                                                <span className="text-xs md:text-sm font-bold text-gray-500">{item.name}</span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                        </div>
+
+                        {/* Error Feedback Modal */}
+                        {errorMsg && (
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white px-8 py-4 rounded-2xl shadow-2xl animate-shake z-50 border-4 border-red-700">
+                                <div className="flex items-center gap-3">
+                                    <i className="fa-solid fa-triangle-exclamation text-2xl"></i>
+                                    <span className="font-bold text-lg text-center">{errorMsg}</span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Success Feedback */}
+                        {isFinished && (
+                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-50 backdrop-blur-sm">
+                                <div className="bg-white p-8 rounded-3xl shadow-2xl text-center animate-pop border-b-8 border-green-500">
+                                    <div className="text-8xl mb-4">🎉</div>
+                                    <h2 className="text-3xl font-bold text-green-600 mb-2">Hebat Sekali!</h2>
+                                    <p className="text-gray-600 mb-6">Kamu berhasil mencocokkan semua bentuk.</p>
+                                    <button onClick={startNewGame} className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition transform hover:scale-105">
+                                        Main Lagi
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                    </div>
+
+                    {/* Footer */}
+                    <footer className="bg-white border-t-4 border-purple-300 py-3 z-20">
+                        <div className="container mx-auto text-center">
+                            <p className="text-gray-600 text-xs md:text-sm font-bold">
+                                Dibuat oleh <span className="text-purple-600">Abdul Salim Owner folderosn.com</span>
+                            </p>
+                            <a href="https://pakabdulsalim.blogspot.com/" target="_blank" className="inline-block text-blue-500 hover:text-blue-700 font-bold hover:underline transition-all text-xs">
+                                Kunjungi: https://pakabdulsalim.blogspot.com
+                            </a>
+                        </div>
+                    </footer>
+
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
