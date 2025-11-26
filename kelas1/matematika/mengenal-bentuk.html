@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Bentuk Bangun Datar</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Font & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Varela+Round&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Varela Round', sans-serif;
+            background-color: #fff1f2; /* Rose tint */
+            background-image: radial-gradient(#fbcfe8 2px, transparent 2px);
+            background-size: 24px 24px;
+            user-select: none;
+        }
+        
+        .font-title { font-family: 'Fredoka', sans-serif; }
+
+        /* Animations */
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .animate-shake { animation: shake 0.4s; }
+
+        .shape-btn {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .shape-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .shape-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <div id="root" class="flex-grow"></div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t-4 border-pink-300 py-4 mt-auto">
+        <div class="container mx-auto text-center">
+            <p class="text-gray-600 text-sm md:text-base font-bold">
+                Dibuat oleh <span class="text-pink-600">Abdul Salim Owner folderosn.com</span>
+            </p>
+            <a href="https://pakabdulsalim.blogspot.com/" target="_blank" class="inline-block mt-1 text-blue-500 hover:text-blue-700 font-bold hover:underline transition-all text-sm">
+                Kunjungi: https://pakabdulsalim.blogspot.com
+            </a>
+        </div>
+    </footer>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- 1. SHAPE COMPONENTS (SVG) ---
+        
+        const Shapes = {
+            Segitiga: ({color}) => <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md"><polygon points="50,10 90,90 10,90" fill={color} stroke="rgba(0,0,0,0.1)" strokeWidth="3"/></svg>,
+            Segiempat: ({color}) => <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md"><rect x="15" y="15" width="70" height="70" rx="5" fill={color} stroke="rgba(0,0,0,0.1)" strokeWidth="3"/></svg>,
+            Lingkaran: ({color}) => <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md"><circle cx="50" cy="50" r="40" fill={color} stroke="rgba(0,0,0,0.1)" strokeWidth="3"/></svg>,
+            PersegiPanjang: ({color}) => <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md"><rect x="10" y="30" width="80" height="40" rx="4" fill={color} stroke="rgba(0,0,0,0.1)" strokeWidth="3"/></svg>
+        };
+
+        // --- 2. LOGIC & DATA ---
+
+        const COLORS = ["#ef4444", "#3b82f6", "#22c55e", "#eab308", "#a855f7", "#f97316", "#ec4899", "#06b6d4"];
+        const SHAPE_TYPES = ['Segitiga', 'Segiempat', 'Lingkaran', 'PersegiPanjang'];
+        
+        const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+        const speak = (text) => {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID';
+                window.speechSynthesis.speak(utterance);
+            }
+        };
+
+        const generateQuestions = (count = 10) => {
+            let quests = [];
+            for (let i = 0; i < count; i++) {
+                const targetShape = getRandom(SHAPE_TYPES);
+                
+                // Buat Opsi Jawaban (3 Pilihan)
+                let options = [];
+                
+                // 1. Jawaban Benar
+                options.push({
+                    type: targetShape,
+                    color: getRandom(COLORS),
+                    isCorrect: true
+                });
+
+                // 2. Pengecoh
+                const distractors = SHAPE_TYPES.filter(s => s !== targetShape);
+                // Ambil 2 pengecoh acak
+                const shuffledDistractors = distractors.sort(() => 0.5 - Math.random()).slice(0, 2);
+                
+                shuffledDistractors.forEach(d => {
+                    options.push({
+                        type: d,
+                        color: getRandom(COLORS),
+                        isCorrect: false
+                    });
+                });
+
+                // Acak posisi opsi
+                options.sort(() => Math.random() - 0.5);
+
+                quests.push({
+                    id: i + 1,
+                    target: targetShape,
+                    targetLabel: targetShape.replace(/([A-Z])/g, ' $1').trim(), // Add space for 'PersegiPanjang' -> 'Persegi Panjang'
+                    options: options
+                });
+            }
+            return quests;
+        };
+
+        // --- 3. MAIN APP ---
+
+        const App = () => {
+            const [gameState, setGameState] = useState('start'); // start, playing, finished
+            const [questions, setQuestions] = useState([]);
+            const [qIndex, setQIndex] = useState(0);
+            const [feedback, setFeedback] = useState(null); // correct, wrong
+
+            // Init
+            useEffect(() => {
+                setQuestions(generateQuestions());
+            }, []);
+
+            const currentQ = questions[qIndex];
+
+            // Auto TTS
+            useEffect(() => {
+                if (gameState === 'playing' && currentQ) {
+                    speak(`Manakah yang berbentuk ${currentQ.targetLabel}?`);
+                }
+            }, [qIndex, gameState]);
+
+            const handleStart = () => {
+                setQuestions(generateQuestions());
+                setQIndex(0);
+                setFeedback(null);
+                setGameState('playing');
+                speak("Ayo pilih bentuk yang benar!");
+            };
+
+            const handleAnswer = (isCorrect) => {
+                if (feedback) return;
+
+                if (isCorrect) {
+                    setFeedback('correct');
+                    speak("Benar!");
+                    confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+                    
+                    setTimeout(() => {
+                        setFeedback(null);
+                        if (qIndex < 9) {
+                            setQIndex(qIndex + 1);
+                        } else {
+                            setGameState('finished');
+                            speak("Selamat! Kamu sudah menyelesaikan semua soal.");
+                        }
+                    }, 1500);
+                } else {
+                    setFeedback('wrong');
+                    speak("Coba lagi ya.");
+                    setTimeout(() => setFeedback(null), 1000);
+                }
+            };
+
+            // --- SCREEN: START ---
+            if (gameState === 'start') {
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center relative">
+                        <div className="absolute top-10 left-10 text-6xl opacity-50 animate-bounce">🔺</div>
+                        <div className="absolute bottom-20 right-10 text-6xl opacity-50 animate-bounce" style={{animationDelay: '0.5s'}}>🔵</div>
+                        
+                        <h1 className="text-5xl md:text-6xl font-bold text-pink-600 mb-6 font-title drop-shadow-md">
+                            Kuis Bentuk
+                        </h1>
+                        <p className="text-xl text-gray-600 mb-8">
+                            Pasangkan nama bentuk dengan gambarnya!
+                        </p>
+                        <button 
+                            onClick={handleStart}
+                            className="bg-blue-500 hover:bg-blue-600 text-white text-2xl font-bold py-4 px-12 rounded-full shadow-2xl transform transition hover:scale-105 active:scale-95 border-b-8 border-blue-700"
+                        >
+                            MULAI
+                        </button>
+                    </div>
+                );
+            }
+
+            // --- SCREEN: FINISHED ---
+            if (gameState === 'finished') {
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center bg-green-50">
+                        <div className="text-9xl mb-6 animate-bounce">🏆</div>
+                        <h1 className="text-5xl font-bold text-green-600 mb-4 font-title">Hebat!</h1>
+                        <p className="text-2xl text-gray-600 mb-8">Kamu sudah tahu semua bentuk!</p>
+                        <button 
+                            onClick={handleStart}
+                            className="bg-pink-500 hover:bg-pink-600 text-white text-xl font-bold py-3 px-10 rounded-full shadow-lg transform transition hover:scale-105 border-b-8 border-pink-700"
+                        >
+                            Main Lagi
+                        </button>
+                    </div>
+                );
+            }
+
+            // --- SCREEN: PLAYING ---
+            return (
+                <div className="min-h-screen flex flex-col items-center py-6 px-4 max-w-5xl mx-auto w-full">
+                    
+                    {/* Header */}
+                    <div className="w-full flex justify-between items-center mb-6">
+                        <button onClick={() => setGameState('start')} className="bg-white p-2 rounded-full shadow text-gray-400 hover:text-gray-600">
+                            <i className="fa-solid fa-house text-xl"></i>
+                        </button>
+                        <div className="bg-white px-6 py-2 rounded-full shadow border-2 border-pink-200">
+                            <span className="font-bold text-pink-600">Soal {qIndex + 1} / 10</span>
+                        </div>
+                        <button onClick={() => speak(`Manakah yang berbentuk ${currentQ.targetLabel}?`)} className="bg-white p-2 rounded-full shadow text-pink-500 hover:text-pink-700">
+                            <i className="fa-solid fa-volume-high text-xl"></i>
+                        </button>
+                    </div>
+
+                    {/* Main Game Area - Split Layout */}
+                    <div className="flex flex-col md:flex-row gap-6 w-full items-stretch animate-pop">
+                        
+                        {/* LEFT SIDE: TEXT NAME */}
+                        <div className="flex-1 bg-white rounded-3xl shadow-xl border-4 border-pink-200 p-8 flex flex-col items-center justify-center relative overflow-hidden min-h-[200px]">
+                            <div className="absolute top-0 left-0 w-full h-4 bg-pink-200"></div>
+                            <p className="text-gray-500 font-bold uppercase tracking-wider mb-2 text-sm">Cari Bentuk:</p>
+                            <h2 className="text-4xl md:text-5xl font-bold text-pink-600 font-title text-center break-words">
+                                {currentQ.targetLabel}
+                            </h2>
+                        </div>
+
+                        {/* RIGHT SIDE: OPTIONS GRID */}
+                        <div className="flex-[2] grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {currentQ.options.map((opt, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => handleAnswer(opt.isCorrect)}
+                                    className="shape-btn bg-white rounded-3xl shadow-lg border-4 border-blue-100 hover:border-blue-300 p-6 flex items-center justify-center aspect-square relative group"
+                                >
+                                    <div className="w-24 h-24 md:w-32 md:h-32 group-hover:scale-110 transition-transform">
+                                        {React.createElement(Shapes[opt.type], { color: opt.color })}
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+
+                    </div>
+
+                    {/* Feedback Overlay */}
+                    {feedback === 'correct' && (
+                        <div className="fixed inset-0 flex items-center justify-center bg-white/80 z-50 animate-pop">
+                            <div className="text-center transform scale-125">
+                                <div className="text-9xl mb-2">✨</div>
+                                <h2 className="text-5xl font-bold text-green-500 font-title drop-shadow-sm">BENAR!</h2>
+                            </div>
+                        </div>
+                    )}
+                    {feedback === 'wrong' && (
+                        <div className="fixed inset-0 flex items-center justify-center bg-white/80 z-50 animate-pop">
+                            <div className="bg-red-50 px-12 py-8 rounded-3xl border-4 border-red-200 text-center shadow-2xl animate-shake">
+                                <div className="text-7xl mb-4">😢</div>
+                                <h2 className="text-3xl font-bold text-red-500">Salah, coba lagi ya!</h2>
+                            </div>
+                        </div>
+                    )}
+
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
