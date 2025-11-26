@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Menyusun Bentuk - Kelas 1 SD</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Font & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Varela+Round&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Varela Round', sans-serif;
+            background-color: #fff7ed; /* Orange tint */
+            background-image: radial-gradient(#ffedd5 2px, transparent 2px);
+            background-size: 24px 24px;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        .font-title { font-family: 'Fredoka', sans-serif; }
+
+        /* Draggable Piece Styles */
+        .draggable-piece {
+            cursor: grab;
+            touch-action: none;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2));
+            transition: transform 0.1s;
+            position: absolute; /* Ensure absolute positioning */
+        }
+        .draggable-piece:active {
+            cursor: grabbing;
+            z-index: 100 !important;
+            transform: scale(1.1);
+        }
+        .draggable-piece.placed {
+            cursor: default;
+            transition: all 0.3s ease-out;
+            z-index: 1 !important;
+            filter: none;
+        }
+
+        /* Pop In Animation */
+        @keyframes pop-in {
+            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+            60% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        .animate-pop-in { animation: pop-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+    <div id="root" class="flex-grow h-full"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useLayoutEffect } = React;
+
+        // --- 1. ASSETS: SVG SHAPES ---
+        const SVGS = {
+            Square: ({color}) => (
+                <svg viewBox="0 0 100 100" className="w-full h-full">
+                    <rect x="2" y="2" width="96" height="96" rx="8" fill={color} stroke="#fff" strokeWidth="4"/>
+                </svg>
+            ),
+            Triangle: ({color}) => (
+                <svg viewBox="0 0 100 100" className="w-full h-full">
+                    <polygon points="50,5 95,95 5,95" fill={color} stroke="#fff" strokeWidth="4" strokeLinejoin="round"/>
+                </svg>
+            ),
+            Circle: ({color}) => (
+                <svg viewBox="0 0 100 100" className="w-full h-full">
+                    <circle cx="50" cy="50" r="46" fill={color} stroke="#fff" strokeWidth="4"/>
+                </svg>
+            ),
+            RectH: ({color}) => (
+                <svg viewBox="0 0 100 50" className="w-full h-full">
+                    <rect x="2" y="2" width="96" height="46" rx="8" fill={color} stroke="#fff" strokeWidth="4"/>
+                </svg>
+            ),
+            RectV: ({color}) => (
+                <svg viewBox="0 0 50 100" className="w-full h-full">
+                    <rect x="2" y="2" width="46" height="96" rx="8" fill={color} stroke="#fff" strokeWidth="4"/>
+                </svg>
+            ),
+        };
+
+        // --- 2. DATA: PUZZLE BLUEPRINTS ---
+        // Coordinates relative to 300x300 Canvas
+        const BLUEPRINTS = [
+            {
+                name: 'Rumah',
+                pieces: [
+                    { id: 'p1', type: 'Triangle', color: '#ef4444', target: { x: 50, y: 20 }, w: 200, h: 200 }, 
+                    { id: 'p2', type: 'Square', color: '#facc15', target: { x: 75, y: 120 }, w: 150, h: 150 }, 
+                ]
+            },
+            {
+                name: 'Roket',
+                pieces: [
+                    { id: 'p1', type: 'Triangle', color: '#ef4444', target: { x: 100, y: 10 }, w: 100, h: 100 }, 
+                    { id: 'p2', type: 'RectV', color: '#3b82f6', target: { x: 112.5, y: 110 }, w: 75, h: 150 }, 
+                    { id: 'p3', type: 'Triangle', color: '#f97316', target: { x: 50, y: 200 }, w: 80, h: 80 }, 
+                    { id: 'p4', type: 'Triangle', color: '#f97316', target: { x: 170, y: 200 }, w: 80, h: 80 }, 
+                ]
+            },
+            {
+                name: 'Kereta',
+                pieces: [
+                    { id: 'p1', type: 'RectH', color: '#3b82f6', target: { x: 20, y: 100 }, w: 150, h: 75 }, 
+                    { id: 'p2', type: 'Square', color: '#ef4444', target: { x: 170, y: 75 }, w: 100, h: 100 }, 
+                    { id: 'p3', type: 'Circle', color: '#1f2937', target: { x: 40, y: 175 }, w: 60, h: 60 }, 
+                    { id: 'p4', type: 'Circle', color: '#1f2937', target: { x: 110, y: 175 }, w: 60, h: 60 }, 
+                    { id: 'p5', type: 'Circle', color: '#1f2937', target: { x: 190, y: 175 }, w: 60, h: 60 }, 
+                ]
+            },
+            {
+                name: 'Robot',
+                pieces: [
+                    { id: 'p1', type: 'Square', color: '#10b981', target: { x: 100, y: 20 }, w: 100, h: 100 }, 
+                    { id: 'p2', type: 'RectH', color: '#3b82f6', target: { x: 50, y: 120 }, w: 200, h: 100 }, 
+                    { id: 'p3', type: 'RectV', color: '#facc15', target: { x: 70, y: 200 }, w: 60, h: 90 }, 
+                    { id: 'p4', type: 'RectV', color: '#facc15', target: { x: 170, y: 200 }, w: 60, h: 90 }, 
+                ]
+            }
+        ];
+
+        const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        const SNAP_DISTANCE = 50; 
+
+        const speak = (text) => {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID';
+                window.speechSynthesis.speak(utterance);
+            }
+        };
+
+        // --- 3. COMPONENTS ---
+
+        const PuzzlePiece = ({ piece, onSnap, containerRef, targetCanvasRef, isPlaced }) => {
+            // Start with a default position to ensure visibility
+            const [pos, setPos] = useState({ x: 20, y: 20 }); 
+            const [isDragging, setIsDragging] = useState(false);
+            const [isInitialized, setIsInitialized] = useState(false);
+            const pieceRef = useRef(null);
+
+            // Initialize Random Position (Scatter around the work area)
+            useLayoutEffect(() => {
+                if (!isPlaced && containerRef.current && !isInitialized) {
+                    const containerRect = containerRef.current.getBoundingClientRect();
+                    
+                    // Define limits to keep inside container
+                    const maxX = containerRect.width - piece.w - 10;
+                    const maxY = containerRect.height - piece.h - 10;
+                    
+                    // Randomize within container
+                    let randomX = 10 + Math.random() * maxX;
+                    let randomY = 10 + Math.random() * maxY;
+
+                    // Avoid center (Target Area) if possible
+                    const centerX = containerRect.width / 2;
+                    const centerY = containerRect.height / 2;
+                    const safeZone = 120; // Pixels from center to avoid
+
+                    if (Math.abs(randomX - centerX) < safeZone && Math.abs(randomY - centerY) < safeZone) {
+                        // Push to sides
+                        if (randomX < centerX) randomX = Math.max(10, randomX - safeZone);
+                        else randomX = Math.min(maxX, randomX + safeZone);
+                    }
+
+                    setPos({ x: randomX, y: randomY });
+                    setIsInitialized(true);
+                }
+            }, [containerRef, piece, isPlaced, isInitialized]);
+
+            // Logic for Placed Pieces (Snap to Target Canvas coordinates)
+            useEffect(() => {
+                if (isPlaced && targetCanvasRef.current && containerRef.current) {
+                    const targetRect = targetCanvasRef.current.getBoundingClientRect();
+                    const containerRect = containerRef.current.getBoundingClientRect();
+                    
+                    // Calculate offset relative to the main container
+                    const offsetX = targetRect.left - containerRect.left;
+                    const offsetY = targetRect.top - containerRect.top;
+
+                    setPos({
+                        x: offsetX + piece.target.x,
+                        y: offsetY + piece.target.y
+                    });
+                }
+            }, [isPlaced, targetCanvasRef, containerRef, piece]);
+
+            const handlePointerDown = (e) => {
+                if (isPlaced) return;
+                e.preventDefault(); // Prevent page scroll
+                setIsDragging(true);
+                e.target.setPointerCapture(e.pointerId);
+                speak("Bentuk ini");
+            };
+
+            const handlePointerMove = (e) => {
+                if (!isDragging || isPlaced) return;
+                const parentRect = containerRef.current.getBoundingClientRect();
+                
+                // Center the piece on the cursor
+                let newX = e.clientX - parentRect.left - (piece.w / 2);
+                let newY = e.clientY - parentRect.top - (piece.h / 2);
+
+                setPos({ x: newX, y: newY });
+            };
+
+            const handlePointerUp = (e) => {
+                if (!isDragging || isPlaced) return;
+                setIsDragging(false);
+                e.target.releasePointerCapture(e.pointerId);
+
+                // Check Snap
+                if (targetCanvasRef.current && containerRef.current) {
+                    const targetRect = targetCanvasRef.current.getBoundingClientRect();
+                    // Mouse position relative to viewport is e.clientX/Y
+                    
+                    // Target slot position relative to viewport
+                    const slotScreenX = targetRect.left + piece.target.x + (piece.w / 2);
+                    const slotScreenY = targetRect.top + piece.target.y + (piece.h / 2);
+
+                    const dist = Math.hypot(e.clientX - slotScreenX, e.clientY - slotScreenY);
+
+                    if (dist < SNAP_DISTANCE) {
+                        speak("Pas!");
+                        onSnap(piece.id);
+                    }
+                }
+            };
+
+            const ShapeIcon = SVGS[piece.type];
+
+            return (
+                <div
+                    ref={pieceRef}
+                    className={`absolute draggable-piece ${isPlaced ? 'placed' : 'animate-pop-in'}`}
+                    style={{ 
+                        left: pos.x, 
+                        top: pos.y, 
+                        width: piece.w, 
+                        height: piece.h,
+                        zIndex: isDragging ? 100 : (isPlaced ? 5 : 10),
+                        cursor: isPlaced ? 'default' : 'grab'
+                    }}
+                    onPointerDown={handlePointerDown}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                >
+                    <svg viewBox="0 0 100 100" className="w-full h-full">
+                        <ShapeIcon color={piece.color} />
+                    </svg>
+                </div>
+            );
+        };
+
+        // --- 4. MAIN APP ---
+
+        const App = () => {
+            const [screen, setScreen] = useState('start');
+            const [currentPuzzle, setCurrentPuzzle] = useState(null);
+            const [placedPieces, setPlacedPieces] = useState({});
+            
+            const workCanvasRef = useRef(null);
+            const targetCanvasRef = useRef(null);
+
+            useEffect(() => {
+                loadNewPuzzle();
+            }, []);
+
+            const loadNewPuzzle = () => {
+                const blueprint = getRandom(BLUEPRINTS);
+                setCurrentPuzzle(blueprint);
+                const initialPlaced = {};
+                blueprint.pieces.forEach(p => initialPlaced[p.id] = false);
+                setPlacedPieces(initialPlaced);
+            };
+
+            const handleStart = () => {
+                loadNewPuzzle();
+                setScreen('playing');
+                speak("Ayo susun bentuknya sesuai contoh!");
+            };
+
+            const handleSnap = (pieceId) => {
+                setPlacedPieces(prev => {
+                    const newState = { ...prev, [pieceId]: true };
+                    if (Object.values(newState).every(v => v)) {
+                        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                        speak("Hebat! Gambar berhasil disusun.");
+                        setTimeout(() => setScreen('finish'), 2000);
+                    }
+                    return newState;
+                });
+            };
+
+            // --- SCREEN RENDERERS ---
+
+            if (screen === 'start') {
+                return (
+                    <div className="h-full flex flex-col items-center justify-center p-4 text-center bg-orange-50 relative">
+                        <div className="absolute top-20 left-10 opacity-50 animate-pulse w-24 h-24">
+                            <svg viewBox="0 0 100 100" className="w-full h-full"><SVGS.Triangle color="#ef4444" /></svg>
+                        </div>
+                        <div className="absolute bottom-32 right-10 opacity-50 animate-pulse w-24 h-24" style={{animationDelay: '0.5s'}}>
+                            <svg viewBox="0 0 100 100" className="w-full h-full"><SVGS.Square color="#3b82f6" /></svg>
+                        </div>
+                        <h1 className="text-5xl md:text-6xl font-bold text-orange-600 mb-6 font-title drop-shadow-md">
+                            Menyusun Bentuk
+                        </h1>
+                        <p className="text-xl text-gray-600 mb-8 max-w-md">
+                            Tarik potongan bentuk ke gambar bayangan agar menjadi gambar yang utuh!
+                        </p>
+                        <button onClick={handleStart} className="bg-green-500 hover:bg-green-600 text-white text-2xl font-bold py-4 px-16 rounded-full shadow-2xl transform transition hover:scale-105 active:scale-95 border-b-8 border-green-700">
+                            MULAI MAIN
+                        </button>
+                    </div>
+                );
+            }
+
+            if (screen === 'finish') {
+                return (
+                    <div className="h-full flex flex-col items-center justify-center p-4 text-center bg-yellow-50">
+                        <div className="text-9xl mb-4 animate-bounce">✨</div>
+                        <h1 className="text-5xl font-bold text-orange-600 mb-4 font-title">Berhasil!</h1>
+                        <p className="text-2xl text-gray-600 mb-8">Gambarnya jadi bagus sekali.</p>
+                        <button onClick={handleStart} className="bg-blue-500 hover:bg-blue-600 text-white text-xl font-bold py-3 px-10 rounded-full shadow-lg transform transition hover:scale-105 border-b-8 border-blue-700">
+                            Main Lagi
+                        </button>
+                        <div className="mt-10">
+                            <p className="text-gray-500 text-sm font-bold">Dibuat oleh <span className="text-orange-600">Abdul Salim Owner folderosn.com</span></p>
+                            <a href="https://pakabdulsalim.blogspot.com/" target="_blank" className="text-blue-500 text-sm font-bold hover:underline">Kunjungi: https://pakabdulsalim.blogspot.com</a>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="flex flex-col h-full relative overflow-hidden bg-orange-50">
+                    
+                    {/* Header */}
+                    <div className="bg-white/90 p-4 flex justify-between items-center shadow-sm z-20 backdrop-blur-sm">
+                        <div className="flex items-center gap-4">
+                            <button onClick={() => setScreen('start')} className="text-gray-400 hover:text-gray-600 bg-white p-2 rounded-full shadow">
+                                <i className="fa-solid fa-house text-xl"></i>
+                            </button>
+                            <h2 className="text-2xl font-bold text-orange-600 font-title">Susun: {currentPuzzle.name}</h2>
+                        </div>
+                        <button onClick={() => speak("Ayo susun bentuknya sesuai contoh!")} className="bg-white p-2 rounded-full shadow text-orange-500 hover:text-orange-700">
+                            <i className="fa-solid fa-volume-high text-xl"></i>
+                        </button>
+                    </div>
+
+                    {/* GAME CONTENT: SPLIT SCREEN */}
+                    <div className="flex-grow flex flex-col md:flex-row p-4 gap-4 relative overflow-hidden">
+                        
+                        {/* LEFT SIDE: EXAMPLE (CONTOH JADI) */}
+                        <div className="w-full md:w-1/3 bg-white rounded-3xl border-4 border-orange-200 p-4 flex flex-col items-center shadow-md z-10 h-1/3 md:h-auto relative">
+                            <div className="absolute top-0 left-0 bg-orange-200 text-orange-800 px-4 py-1 rounded-br-xl font-bold text-sm uppercase tracking-wider">
+                                Contoh Jadi
+                            </div>
+                            <div className="relative w-full h-full flex items-center justify-center">
+                                {/* Render Completed Puzzle Non-interactively */}
+                                <svg viewBox="0 0 300 300" className="h-full w-auto drop-shadow-sm">
+                                    {currentPuzzle.pieces.map(p => {
+                                        const ShapeIcon = SVGS[p.type];
+                                        return (
+                                            <g key={p.id} transform={`translate(${p.target.x}, ${p.target.y})`}>
+                                                <foreignObject width={p.w} height={p.h}>
+                                                    <svg viewBox="0 0 100 100" className="w-full h-full">
+                                                        <ShapeIcon color={p.color} />
+                                                    </svg>
+                                                </foreignObject>
+                                            </g>
+                                        );
+                                    })}
+                                </svg>
+                            </div>
+                        </div>
+
+                        {/* RIGHT SIDE: WORK AREA (SCATTERED PIECES + TARGET) */}
+                        <div className="flex-1 relative bg-orange-100/50 rounded-3xl border-4 border-dashed border-orange-300 overflow-hidden" ref={workCanvasRef}>
+                            
+                            {/* Background Hint */}
+                            <div className="absolute top-2 right-2 text-orange-300 font-bold text-xs uppercase pointer-events-none">Area Kerja</div>
+
+                            {/* 1. Target Drop Zone (Dimmed/Ghost Image) */}
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-white/60 rounded-2xl border-2 border-orange-200 shadow-inner pointer-events-none">
+                                <div ref={targetCanvasRef} className="w-full h-full">
+                                    <svg viewBox="0 0 300 300" className="w-full h-full opacity-30 filter grayscale">
+                                        {currentPuzzle.pieces.map(p => {
+                                            const ShapeIcon = SVGS[p.type];
+                                            return (
+                                                <g key={p.id + '_outline'} transform={`translate(${p.target.x}, ${p.target.y})`}>
+                                                     <foreignObject width={p.w} height={p.h}>
+                                                        <svg viewBox="0 0 100 100" className="w-full h-full">
+                                                            <ShapeIcon color="#333" />
+                                                        </svg>
+                                                    </foreignObject>
+                                                </g>
+                                            );
+                                        })}
+                                    </svg>
+                                    {/* Dashed Border around target area */}
+                                    <div className="absolute inset-0 border-2 border-dashed border-orange-300 rounded-2xl opacity-50"></div>
+                                </div>
+                            </div>
+
+                            {/* 2. Draggable Pieces (Scattered) */}
+                            {currentPuzzle.pieces.map((p, idx) => (
+                                <PuzzlePiece 
+                                    key={p.id} 
+                                    index={idx}
+                                    totalPieces={currentPuzzle.pieces.length}
+                                    piece={p} 
+                                    onSnap={handleSnap}
+                                    containerRef={workCanvasRef}
+                                    targetCanvasRef={targetCanvasRef}
+                                    isPlaced={placedPieces[p.id]}
+                                />
+                            ))}
+
+                        </div>
+                    </div>
+
+                    {/* Footer */}
+                    <footer className="bg-white border-t-4 border-orange-300 py-2 z-20 relative">
+                        <div className="container mx-auto text-center">
+                            <p className="text-gray-600 text-xs md:text-sm font-bold">Dibuat oleh <span className="text-orange-600">Abdul Salim Owner folderosn.com</span></p>
+                            <a href="https://pakabdulsalim.blogspot.com/" target="_blank" className="inline-block text-blue-500 hover:text-blue-700 font-bold hover:underline transition-all text-xs">Kunjungi: https://pakabdulsalim.blogspot.com</a>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
