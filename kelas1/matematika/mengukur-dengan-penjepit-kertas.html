@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Ukur Dengan Klip</title>
+    
+    <!-- Memuat React dan ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Memuat Babel untuk menerjemahkan kode React -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Memuat Tailwind CSS untuk tampilan -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Animasi tambahan */
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-bounce-in {
+            animation: bounceIn 0.6s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+        }
+        /* Mencegah scroll horizontal berlebih pada mobile */
+        body { overflow-x: hidden; }
+    </style>
+</head>
+<body class="bg-blue-50">
+
+    <!-- Tempat Aplikasi akan Muncul -->
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- KOLEKSI IKON (SVG Murni agar tidak perlu library luar) ---
+        const IconPlay = ({size=24, className=""}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        );
+        const IconRotateCcw = ({size=24, className=""}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12" /><path d="M3 3v9h9" /></svg>
+        );
+        const IconCheck = ({size=24, className=""}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"></polyline></svg>
+        );
+        const IconStar = ({size=24, className=""}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        );
+        const IconArrowRight = ({size=24, className=""}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        );
+        const IconVolume2 = ({size=24, className=""}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        );
+        const IconExternalLink = ({size=14, className=""}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        );
+        const IconScissors = ({size=64, className=""}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
+        );
+
+        const CLIP_WIDTH = 50; // Lebar visual satu jepitan kertas dalam pixel
+
+        // --- KOMPONEN VISUAL BENDA ---
+
+        const PaperClip = () => (
+            <svg width="50" height="25" viewBox="0 0 50 25" className="drop-shadow-sm flex-shrink-0">
+                <rect x="2" y="5" width="46" height="15" rx="7.5" fill="none" stroke="#3b82f6" strokeWidth="3" />
+                <path d="M15 5 V15 M35 5 V15" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
+                <circle cx="6" cy="12.5" r="2" fill="#bfdbfe" />
+                <circle cx="44" cy="12.5" r="2" fill="#bfdbfe" />
+            </svg>
+        );
+
+        const Pencil = ({ width }) => {
+            const tipWidth = 25;
+            const bodyWidth = width - tipWidth;
+            return (
+                <div className="flex items-center drop-shadow-md h-10" style={{ width: `${width}px` }}>
+                    <div className="w-8 h-full bg-pink-400 rounded-l-md border-y border-l border-gray-400 relative">
+                        <div className="absolute right-0 top-0 h-full w-3 bg-gray-300 border-l border-gray-400"></div>
+                    </div>
+                    <div className="flex-grow h-full bg-blue-600 border-y border-blue-800 flex items-center justify-center relative">
+                        <div className="w-full h-[2px] bg-white/20"></div>
+                    </div>
+                    <div className="relative" style={{ width: `${tipWidth}px`, height: '40px' }}>
+                        <div className="absolute left-0 top-0" style={{ width: 0, height: 0, borderLeft: `${tipWidth}px solid #fde047`, borderTop: '20px solid transparent', borderBottom: '20px solid transparent' }}></div>
+                        <div className="absolute left-0 top-0" style={{ width: 0, height: 0, borderLeft: '8px solid black', borderTop: '20px solid transparent', borderBottom: '20px solid transparent', transform: 'scaleY(0.2) translateX(0px)', transformOrigin: 'left center' }}></div>
+                    </div>
+                </div>
+            );
+        };
+
+        const BrushObj = ({ width }) => {
+            const bristleWidth = 40;
+            const metalWidth = 15;
+            const handleWidth = width - bristleWidth - metalWidth;
+            return (
+                <div className="flex items-center drop-shadow-md h-8" style={{ width: `${width}px` }}>
+                    <div className="h-full bg-orange-700 rounded-l-full border-y border-l border-orange-900 flex-grow" style={{ width: `${handleWidth}px` }}></div>
+                    <div className="h-9 bg-gray-300 border border-gray-400" style={{ width: `${metalWidth}px`, marginTop: '-2px' }}>
+                        <div className="w-full h-1/2 border-b border-gray-400 opacity-50"></div>
+                    </div>
+                    <div className="h-full bg-orange-400 rounded-r-md border-y border-r border-orange-600 relative overflow-hidden" style={{ width: `${bristleWidth}px` }}>
+                        <div className="absolute top-2 w-full h-[1px] bg-orange-600 opacity-50"></div>
+                        <div className="absolute bottom-2 w-full h-[1px] bg-orange-600 opacity-50"></div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ScissorObj = ({ width }) => {
+            const handleWidth = 60;
+            const bladeWidth = width - handleWidth;
+            return (
+                <div className="flex items-center drop-shadow-md h-12" style={{ width: `${width}px` }}>
+                    <div style={{ width: `${handleWidth}px` }} className="flex-shrink-0 relative z-10">
+                        <svg width="60" height="48" viewBox="0 0 60 48">
+                            <circle cx="20" cy="12" r="10" fill="white" stroke="#ef4444" strokeWidth="6" />
+                            <circle cx="20" cy="36" r="10" fill="white" stroke="#ef4444" strokeWidth="6" />
+                            <path d="M28 12 L40 24 L28 36" fill="none" stroke="#ef4444" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
+                            <circle cx="40" cy="24" r="4" fill="#9ca3af" />
+                        </svg>
+                    </div>
+                    <div className="relative h-full flex flex-col justify-center" style={{ width: `${bladeWidth}px`, marginLeft: '-5px' }}>
+                        <div className="h-3 w-full bg-gray-300 border border-gray-400 transform -rotate-2 origin-left rounded-r-full absolute top-[18px]"></div>
+                        <div className="h-3 w-full bg-gray-400 border border-gray-500 transform rotate-2 origin-left rounded-r-full absolute bottom-[18px]"></div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Comb = ({ width }) => {
+            return (
+                <div className="relative h-12 drop-shadow-md flex flex-col" style={{ width: `${width}px` }}>
+                    <div className="w-full h-4 bg-green-500 border border-green-700 rounded-t-lg z-10"></div>
+                    <div className="w-full h-8 flex justify-between px-1">
+                        {[...Array(Math.floor(width / 10))].map((_, i) => (
+                            <div key={i} className="w-1.5 h-full bg-green-500 border-x border-green-700 rounded-b-sm mx-[1px]"></div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- APLIKASI UTAMA ---
+
+        function UkurDenganKlip() {
+            const [gameState, setGameState] = useState('start');
+            const [questions, setQuestions] = useState([]);
+            const [currentIndex, setCurrentIndex] = useState(0);
+            const [userAnswer, setUserAnswer] = useState('');
+            const [score, setScore] = useState(0);
+            const [feedback, setFeedback] = useState(null);
+
+            const speak = (text) => {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'id-ID';
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1.1;
+                    window.speechSynthesis.speak(utterance);
+                }
+            };
+
+            useEffect(() => {
+                if (gameState === 'playing' && !feedback) {
+                    const timer = setTimeout(() => {
+                        speak("Berapa jepitan kertas panjang benda ini?");
+                    }, 500);
+                    return () => clearTimeout(timer);
+                }
+            }, [currentIndex, gameState, feedback]);
+
+            useEffect(() => {
+                if (feedback === 'correct') speak("Jawaban benar!");
+                else if (feedback === 'incorrect') speak("Silahkan hitung dengan teliti ya.");
+            }, [feedback]);
+
+            const generateQuestions = () => {
+                const newQuestions = [];
+                const types = ['pencil', 'comb', 'scissors', 'brush'];
+                
+                for (let i = 0; i < 5; i++) {
+                    const type = types[Math.floor(Math.random() * types.length)];
+                    const length = Math.floor(Math.random() * 5) + 3; // Panjang 3 - 7
+                    newQuestions.push({ id: i, type, length });
+                }
+                setQuestions(newQuestions);
+                setGameState('playing');
+                setCurrentIndex(0);
+                setScore(0);
+                setUserAnswer('');
+                setFeedback(null);
+            };
+
+            const handleStart = () => {
+                speak("Ayo mulai mengukur!");
+                generateQuestions();
+            };
+
+            const checkAnswer = () => {
+                const currentQ = questions[currentIndex];
+                const answerInt = parseInt(userAnswer);
+
+                if (answerInt === currentQ.length) {
+                    setFeedback('correct');
+                    setScore(score + 1);
+                } else {
+                    setFeedback('incorrect');
+                }
+            };
+
+            const nextQuestion = () => {
+                if (currentIndex < 4) {
+                    setCurrentIndex(currentIndex + 1);
+                    setUserAnswer('');
+                    setFeedback(null);
+                } else {
+                    setGameState('result');
+                    speak("Permainan selesai. Kamu hebat!");
+                }
+            };
+
+            const renderObject = (type, length) => {
+                const objectPixelWidth = length * CLIP_WIDTH;
+                switch (type) {
+                    case 'pencil': return <Pencil width={objectPixelWidth} />;
+                    case 'comb': return <Comb width={objectPixelWidth} />;
+                    case 'scissors': return <ScissorObj width={objectPixelWidth} />;
+                    case 'brush': return <BrushObj width={objectPixelWidth} />;
+                    default: return <Pencil width={objectPixelWidth} />;
+                }
+            };
+
+            const Footer = () => (
+                <div className="mt-8 text-center border-t border-blue-200 pt-4 w-full max-w-2xl">
+                    <p className="text-gray-600 font-medium">Oleh : Abdul Salim</p>
+                    <a href="https://pakabdulsalim.blogspot.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 hover:underline flex items-center justify-center gap-1 text-sm mt-1">
+                        Kunjungi https://pakabdulsalim.blogspot.com <IconExternalLink />
+                    </a>
+                </div>
+            );
+
+            // START SCREEN
+            if (gameState === 'start') {
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center p-4 font-sans">
+                        <div className="bg-white p-8 rounded-3xl shadow-xl border-4 border-blue-300 max-w-md w-full text-center">
+                            <div className="flex justify-center mb-6">
+                                <div className="bg-blue-100 p-4 rounded-full animate-bounce">
+                                    <IconScissors size={64} className="text-blue-500" />
+                                </div>
+                            </div>
+                            <h1 className="text-3xl font-bold text-blue-600 mb-2">Ukur dengan Klip!</h1>
+                            <p className="text-gray-500 mb-8 text-lg">Hitung berapa banyak jepitan kertas panjang benda tersebut.</p>
+                            <button onClick={handleStart} className="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl text-xl font-bold shadow-[0_4px_0_rgb(21,128,61)] active:shadow-none active:translate-y-1 transition-all flex items-center justify-center gap-2">
+                                <IconPlay size={24} fill="currentColor" /> Mulai
+                            </button>
+                        </div>
+                        <Footer />
+                    </div>
+                );
+            }
+
+            // RESULT SCREEN
+            if (gameState === 'result') {
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center p-4 font-sans">
+                        <div className="bg-white p-8 rounded-3xl shadow-xl border-4 border-blue-300 max-w-md w-full text-center animate-bounce-in">
+                            <h2 className="text-2xl font-bold text-gray-700 mb-4">Permainan Selesai!</h2>
+                            <div className="flex justify-center gap-2 mb-6">
+                                {[...Array(5)].map((_, i) => (
+                                    <IconStar key={i} size={40} className={`${i < score ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'} transition-all duration-500`} />
+                                ))}
+                            </div>
+                            <p className="text-5xl font-bold text-blue-600 mb-2">{score} / 5</p>
+                            <p className="text-gray-500 mb-8">{score === 5 ? "Luar Biasa!" : "Semangat Belajar!"}</p>
+                            <button onClick={generateQuestions} className="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-2xl text-xl font-bold shadow-[0_4px_0_rgb(29,78,216)] active:shadow-none active:translate-y-1 transition-all flex items-center justify-center gap-2">
+                                <IconRotateCcw size={24} /> Main Lagi
+                            </button>
+                        </div>
+                        <Footer />
+                    </div>
+                );
+            }
+
+            // GAME SCREEN
+            const currentQ = questions[currentIndex];
+
+            return (
+                <div className="min-h-screen flex flex-col items-center p-4 font-sans">
+                    <div className="w-full max-w-2xl flex justify-between items-center mb-8 bg-white p-4 rounded-2xl shadow-sm border border-blue-100">
+                        <div className="flex items-center gap-2">
+                            <div className="bg-blue-100 p-2 rounded-lg"><IconStar className="text-blue-500 fill-blue-500" size={24} /></div>
+                            <span className="font-bold text-blue-800 text-xl">Skor: {score}</span>
+                        </div>
+                        <div className="px-4 py-2 bg-yellow-100 rounded-full text-yellow-700 font-bold">Soal {currentIndex + 1} dari 5</div>
+                    </div>
+
+                    <div className="bg-white p-8 rounded-3xl shadow-xl border-4 border-blue-200 w-full max-w-3xl flex flex-col items-center relative min-h-[400px] justify-center">
+                        <div className="flex items-center gap-3 mb-10">
+                            <h2 className="text-2xl font-bold text-gray-700 text-center">Berapa jepitan kertas panjang benda ini?</h2>
+                            <button onClick={() => speak("Berapa jepitan kertas panjang benda ini?")} className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition-colors"><IconVolume2 size={24} /></button>
+                        </div>
+
+                        {/* VISUALISASI SOAL */}
+                        <div className="w-full flex flex-col items-center justify-center mb-12 overflow-x-auto relative">
+                            
+                            {/* Garis Bantu Kiri & Kanan */}
+                            <div className="absolute left-1/2 top-0 bottom-0 border-l-2 border-dashed border-red-300 opacity-50 pointer-events-none" style={{ marginLeft: `-${(currentQ.length * CLIP_WIDTH)/2}px` }}></div>
+                            <div className="absolute left-1/2 top-0 bottom-0 border-l-2 border-dashed border-red-300 opacity-50 pointer-events-none" style={{ marginLeft: `${(currentQ.length * CLIP_WIDTH)/2}px` }}></div>
+
+                            <div className="flex flex-col items-start gap-1">
+                                
+                                {/* 1. Benda */}
+                                <div className="transition-all duration-500 transform origin-left">
+                                    {renderObject(currentQ.type, currentQ.length)}
+                                </div>
+
+                                {/* 2. Deretan Jepitan Kertas */}
+                                <div className="flex items-center">
+                                    {[...Array(currentQ.length)].map((_, i) => (
+                                        <div key={i} className="animate-in fade-in slide-in-from-left-4 duration-500" style={{ animationDelay: `${i * 100}ms` }}>
+                                            <PaperClip />
+                                        </div>
+                                    ))}
+                                </div>
+
+                            </div>
+                        </div>
+
+                        {/* INPUT JAWABAN */}
+                        <div className="w-full flex flex-col items-center gap-4">
+                            {!feedback ? (
+                                <div className="flex gap-3 w-full max-w-xs">
+                                    <input
+                                        type="number"
+                                        value={userAnswer}
+                                        onChange={(e) => setUserAnswer(e.target.value)}
+                                        placeholder="?"
+                                        className="w-full p-4 text-center text-3xl font-bold border-4 border-gray-200 rounded-2xl focus:border-blue-400 focus:outline-none transition-colors"
+                                        autoFocus
+                                        onKeyDown={(e) => { if (e.key === 'Enter' && userAnswer) checkAnswer(); }}
+                                    />
+                                    <button onClick={checkAnswer} disabled={!userAnswer} className="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white p-4 rounded-2xl shadow-[0_4px_0_rgb(21,128,61)] active:shadow-none active:translate-y-1 transition-all">
+                                        <IconCheck size={32} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className={`w-full max-w-md p-4 rounded-2xl text-center animate-in zoom-in duration-300 ${feedback === 'correct' ? 'bg-green-100 border-2 border-green-300' : 'bg-red-100 border-2 border-red-300'}`}>
+                                    <h3 className={`text-2xl font-bold mb-2 ${feedback === 'correct' ? 'text-green-700' : 'text-red-700'}`}>
+                                        {feedback === 'correct' ? '🎉 Jawaban Benar!' : '😅 Ups, kurang tepat.'}
+                                    </h3>
+                                    <p className="text-gray-600 text-lg mb-4">
+                                        {feedback === 'incorrect' ? 'Coba hitung klipnya pelan-pelan ya.' : `Panjangnya adalah ${currentQ.length} jepitan kertas.`}
+                                    </p>
+                                    <button onClick={nextQuestion} className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-bold text-lg shadow-[0_4px_0_rgb(29,78,216)] active:shadow-none active:translate-y-1 transition-all inline-flex items-center gap-2">
+                                        Lanjut <IconArrowRight size={20} />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <Footer />
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<UkurDenganKlip />);
+    </script>
+</body>
+</html>
