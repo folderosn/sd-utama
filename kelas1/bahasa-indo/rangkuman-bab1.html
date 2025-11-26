@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan Bahasa Indonesia: Bab 1 - Bunyi Apa?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom Font for Readability */
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Nunito:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #FEF9C3; /* Light Yellow - Warm & Welcoming */
+        }
+
+        h1, h2, h3, .comic-font {
+            font-family: 'Comic Neue', cursive;
+        }
+
+        /* Chart Container Styling - Mandatory Requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Interactive Card Animations */
+        .hover-scale {
+            transition: transform 0.2s;
+        }
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+
+        /* Hide scrollbar for clean UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <span class="text-4xl">📚</span>
+                    <span class="font-bold text-xl text-blue-600 comic-font tracking-wide">Bahasa Indonesia: Bab 1</span>
+                </div>
+                <div class="flex space-x-4">
+                    <button onclick="playClick(); switchMode('student')" id="btn-student" class="px-4 py-2 rounded-full font-bold bg-blue-500 text-white transition hover:bg-blue-600">Zona Siswa 🎓</button>
+                    <button onclick="playClick(); switchMode('teacher')" id="btn-teacher" class="px-4 py-2 rounded-full font-bold bg-gray-200 text-gray-600 transition hover:bg-orange-500 hover:text-white">Zona Guru 👩‍🏫</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="max-w-5xl mx-auto p-4 md:p-6 mb-12">
+
+        <!-- ================= STUDENT ZONE ================= -->
+        <div id="student-zone" class="space-y-12 block fade-in">
+            
+            <!-- Hero / Intro -->
+            <section class="bg-white rounded-3xl p-8 shadow-lg border-b-8 border-blue-200 text-center">
+                <h1 class="text-4xl md:text-5xl font-bold text-blue-600 mb-4">Halo, Teman Baru! 👋</h1>
+                <p class="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
+                    Selamat datang di Bab 1: <strong>Bunyi Apa?</strong>. Di sini kita akan belajar bersama <strong>Boni</strong>, bermain tebak suara, mengenal huruf <strong>B</strong>, dan berkenalan satu sama lain.
+                </p>
+                <div class="inline-block bg-blue-100 px-6 py-3 rounded-xl cursor-pointer hover:bg-blue-200 transition" onclick="playClick(); speak('Selamat datang, ayo kita belajar!');">
+                    <p class="text-blue-800 font-bold">🔊 Klik di sini untuk sapaan!</p>
+                </div>
+            </section>
+
+            <!-- 1. Activity: Menyimak (Listening/Sounds) -->
+            <section class="bg-orange-50 rounded-3xl p-6 shadow-md border border-orange-200">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-orange-600 mb-2">👂 1. Detektif Bunyi</h2>
+                    <p class="text-gray-700">
+                        Di sekitar kita banyak sekali bunyi. Ada bunyi alam, bunyi hewan, dan bunyi benda. 
+                        <strong>Klik kartu di bawah ini</strong> untuk mendengarkan bunyinya!
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="sound-grid">
+                    <!-- Cards injected by JS -->
+                </div>
+            </section>
+
+            <!-- 2. Activity: Literasi (Story) -->
+            <section class="bg-blue-50 rounded-3xl p-6 shadow-md border border-blue-200">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-blue-600 mb-2">📖 2. Cerita: "Duk! Duk! Duk!"</h2>
+                    <p class="text-gray-700">
+                        Ayo simak kisah <strong>Boni</strong> dan bolanya. 
+                        Klik tombol speaker 🔊 untuk mendengarkan cerita.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-inner p-6 md:p-10 relative min-h-[350px] flex flex-col items-center justify-center text-center">
+                    <div id="story-content" class="mb-6 w-full">
+                        <!-- Story Content Injected Here -->
+                    </div>
+                    
+                    <!-- Audio Control -->
+                    <button onclick="readCurrentStory()" class="mb-6 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold py-2 px-6 rounded-full flex items-center gap-2 transform transition hover:scale-105 shadow-md">
+                        <span>🔊</span> Dengar Cerita
+                    </button>
+
+                    <div class="flex space-x-4">
+                        <button onclick="playClick(); prevSlide()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-6 rounded-full">⬅️ Kembali</button>
+                        <button onclick="playClick(); nextSlide()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full">Lanjut ➡️</button>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-400">Halaman <span id="page-num">1</span> dari 4</div>
+                </div>
+            </section>
+
+            <!-- 3. Activity: Fonik (Letter B) -->
+            <section class="bg-green-50 rounded-3xl p-6 shadow-md border border-green-200">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-green-600 mb-2">🅱️ 3. Bengkel Huruf 'B'</h2>
+                    <p class="text-gray-700">
+                        Huruf B itu hebat! 
+                        <strong>Klik tombol suku kata</strong> untuk mendengar bunyi dan contoh katanya.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap gap-4 justify-center mb-8">
+                    <button onclick="playClick(); showSyllable('ba')" class="syllable-btn text-2xl font-bold bg-white border-b-4 border-green-400 text-green-700 px-6 py-4 rounded-xl shadow hover:bg-green-100 transition transform active:scale-95">ba</button>
+                    <button onclick="playClick(); showSyllable('bi')" class="syllable-btn text-2xl font-bold bg-white border-b-4 border-green-400 text-green-700 px-6 py-4 rounded-xl shadow hover:bg-green-100 transition transform active:scale-95">bi</button>
+                    <button onclick="playClick(); showSyllable('bu')" class="syllable-btn text-2xl font-bold bg-white border-b-4 border-green-400 text-green-700 px-6 py-4 rounded-xl shadow hover:bg-green-100 transition transform active:scale-95">bu</button>
+                    <button onclick="playClick(); showSyllable('be')" class="syllable-btn text-2xl font-bold bg-white border-b-4 border-green-400 text-green-700 px-6 py-4 rounded-xl shadow hover:bg-green-100 transition transform active:scale-95">be</button>
+                    <button onclick="playClick(); showSyllable('bo')" class="syllable-btn text-2xl font-bold bg-white border-b-4 border-green-400 text-green-700 px-6 py-4 rounded-xl shadow hover:bg-green-100 transition transform active:scale-95">bo</button>
+                </div>
+
+                <div id="syllable-display" class="bg-white p-6 rounded-2xl shadow-sm text-center min-h-[150px] flex flex-col justify-center items-center">
+                    <p class="text-gray-400 italic">Klik salah satu tombol di atas!</p>
+                </div>
+            </section>
+
+            <!-- 4. Activity: Menulis (Name Tag) -->
+            <section class="bg-purple-50 rounded-3xl p-6 shadow-md border border-purple-200">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold text-purple-600 mb-2">📝 4. Ayo Berkenalan!</h2>
+                        <p class="text-gray-700 mb-4">
+                            Saat berkenalan, kita menyebutkan nama dengan sopan. Ayo buat <strong>Kartu Nama</strong> kamu sendiri!
+                            Isi formulir di bawah ini.
+                        </p>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold text-purple-700 mb-1">Nama Panggilan:</label>
+                                <input type="text" id="input-name" placeholder="Contoh: Budi" class="w-full p-3 rounded-lg border border-purple-200 focus:outline-none focus:border-purple-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-purple-700 mb-1">Hobi Kesukaan:</label>
+                                <input type="text" id="input-hobby" placeholder="Contoh: Main Bola" class="w-full p-3 rounded-lg border border-purple-200 focus:outline-none focus:border-purple-500">
+                            </div>
+                            <button onclick="playClick(); generateCard()" class="w-full bg-purple-500 text-white font-bold py-3 rounded-lg hover:bg-purple-600 transition shadow-lg transform active:translate-y-1">Buat Kartu Namaku!</button>
+                        </div>
+                    </div>
+                    <div class="flex justify-center">
+                        <!-- Card Preview -->
+                        <div id="id-card" class="hidden w-64 h-40 bg-gradient-to-r from-blue-400 to-purple-500 rounded-xl shadow-xl p-4 text-white transform rotate-2 hover:rotate-0 transition duration-300 cursor-pointer" onclick="speakCard()">
+                            <div class="flex justify-between items-start">
+                                <div class="text-3xl">👋</div>
+                                <div class="bg-white text-purple-600 text-xs font-bold px-2 py-1 rounded">KELAS 1 SD</div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-sm opacity-90">Halo, nama saya</p>
+                                <h3 id="card-name-display" class="text-2xl font-bold font-comic tracking-wide">...</h3>
+                            </div>
+                            <div class="mt-2">
+                                <p class="text-xs opacity-90">Saya suka <span id="card-hobby-display" class="font-bold">...</span></p>
+                            </div>
+                        </div>
+                        <div id="card-placeholder" class="w-64 h-40 border-4 border-dashed border-purple-200 rounded-xl flex items-center justify-center text-purple-300 font-bold">
+                            Kartu Nama Kamu
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================= TEACHER ZONE ================= -->
+        <div id="teacher-zone" class="hidden space-y-12 fade-in">
+            
+            <!-- Dashboard Intro -->
+            <section class="bg-white rounded-3xl p-8 shadow-lg border-l-8 border-orange-500">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Panduan Guru: Bab 1 "Bunyi Apa?"</h1>
+                <p class="text-gray-600">
+                    Halaman ini dirancang untuk membantu Bapak/Ibu Guru memetakan tujuan pembelajaran dan memantau asesmen siswa berdasarkan buku panduan. 
+                    Bab ini berfokus pada literasi dasar dan kesadaran fonologis.
+                </p>
+            </section>
+
+            <!-- Competency Analysis Chart -->
+            <section class="bg-white rounded-3xl p-6 shadow-md">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">📊 Peta Kompetensi Bab 1</h2>
+                    <p class="text-sm text-gray-500 mt-2">
+                        Grafik ini memvisualisasikan penekanan materi pada Bab 1. Gunakan ini untuk menyeimbangkan alokasi waktu pengajaran di kelas.
+                        Fokus utama adalah pada <strong>Menyimak</strong> (kesadaran bunyi) dan <strong>Membaca Dasar</strong> (pengenalan huruf).
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Radar Chart: Skill Focus -->
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <h3 class="text-center font-bold text-gray-700 mb-4">Fokus Keterampilan</h3>
+                        <div class="chart-container">
+                            <canvas id="competencyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Doughnut Chart: Target Assessment -->
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <h3 class="text-center font-bold text-gray-700 mb-4">Target Penilaian Kelas</h3>
+                        <div class="chart-container">
+                            <canvas id="assessmentChart"></canvas>
+                        </div>
+                        <p class="text-xs text-center text-gray-500 mt-4">Simulasi distribusi target pencapaian siswa</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Assessment Checklist Tool -->
+            <section class="bg-white rounded-3xl p-6 shadow-md overflow-hidden">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">✅ Ceklis Penilaian Harian</h2>
+                        <p class="text-sm text-gray-500 mt-1">Instrumen penilaian formatif sederhana untuk observasi kelas.</p>
+                    </div>
+                    <button onclick="playClick(); resetChecklist()" class="text-sm text-red-500 hover:text-red-700 underline">Reset Ceklis</button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-700 text-sm uppercase tracking-wider">
+                                <th class="p-4 rounded-tl-lg">Indikator Kemampuan</th>
+                                <th class="p-4 text-center">Belum Bisa</th>
+                                <th class="p-4 text-center rounded-tr-lg">Sudah Bisa</th>
+                            </tr>
+                        </thead>
+                        <tbody id="checklist-body" class="text-gray-700">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Teacher Tips -->
+            <section class="grid md:grid-cols-3 gap-4">
+                <div class="bg-yellow-100 p-4 rounded-xl">
+                    <h3 class="font-bold text-yellow-800 mb-2">💡 Tips Menyimak</h3>
+                    <p class="text-sm text-yellow-900">Bawalah benda nyata (bola, kaleng, botol berisi beras) ke kelas. Biarkan siswa mendengar bunyi aslinya sebelum melihat bendanya.</p>
+                </div>
+                <div class="bg-blue-100 p-4 rounded-xl">
+                    <h3 class="font-bold text-blue-800 mb-2">💡 Tips Membaca</h3>
+                    <p class="text-sm text-blue-900">Gunakan lagu sederhana "Ba-Bi-Bu-Be-Bo" dengan tepukan tangan agar siswa lebih mudah menghafal suku kata.</p>
+                </div>
+                <div class="bg-green-100 p-4 rounded-xl">
+                    <h3 class="font-bold text-green-800 mb-2">💡 Pelibatan Orang Tua</h3>
+                    <p class="text-sm text-green-900">Ingatkan tugas "Jurnal Membaca". Minta orang tua membacakan buku di rumah, seperti rekomendasi "Biji Merah Luna".</p>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-white py-8 mt-auto">
+        <div class="max-w-4xl mx-auto text-center px-4">
+            <p class="mb-2 font-bold">Aplikasi Bantu Ajar Kurikulum Merdeka</p>
+            <p class="mb-1 text-lg">Oleh : Abdul Salim</p>
+            <p class="mb-4">
+                Kunjungi : <a href="https://pakabdulsalim.blogspot.com" target="_blank" class="text-blue-400 hover:text-blue-300 underline transition">https://pakabdulsalim.blogspot.com</a>
+            </p>
+            <div class="text-slate-500 text-xs mt-6 pt-4 border-t border-slate-700">
+                <p>Berdasarkan Buku "Bahasa Indonesia: Aku Bisa! (Edisi Revisi) Bab 1: Bunyi Apa?"</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- DATA STORE ---
+        const sounds = [
+            { id: 1, icon: '⚽', name: 'Bola Pantul', sound: 'Duk! Duk! Duk!', type: 'Benda' },
+            { id: 2, icon: '🐔', name: 'Ayam', sound: 'Kukuruyuk!', type: 'Hewan' },
+            { id: 3, icon: '🌧️', name: 'Hujan', sound: 'Tik! Tik! Tik!', type: 'Alam' },
+            { id: 4, icon: '🏍️', name: 'Motor', sound: 'Brum! Brum!', type: 'Kendaraan' },
+            { id: 5, icon: '🚪', name: 'Pintu', sound: 'Tok! Tok! Tok!', type: 'Benda' },
+            { id: 6, icon: '🔔', name: 'Bel', sound: 'Kring! Kring!', type: 'Benda' },
+            { id: 7, icon: '🦆', name: 'Bebek', sound: 'Wek! Wek! Wek!', type: 'Hewan' },
+            { id: 8, icon: '🌊', name: 'Ombak', sound: 'Byur! Byur!', type: 'Alam' }
+        ];
+
+        const storySlides = [
+            { text: "Ini <strong>Boni</strong>.<br>Boni punya <strong>Bola</strong>.", emoji: "👦⚽", highlight: "B", spoken: "Ini Boni. Boni punya Bola." },
+            { text: "Bola Boni warna <strong>Biru</strong>.<br>Boni suka main bola.", emoji: "🔵😍", highlight: "B", spoken: "Bola Boni warna Biru. Boni suka main bola." },
+            { text: "Boni menendang bola.<br>Bola kena <strong>Batu</strong>.", emoji: "🦶🪨", highlight: "B", spoken: "Boni menendang bola. Bola kena Batu." },
+            { text: "Bunyinya...<br><span class='text-4xl font-black text-red-500 animate-pulse'>DUK! DUK! DUK!</span>", emoji: "💥🔊", highlight: "D", spoken: "Bunyinya... Duk! Duk! Duk!" }
+        ];
+
+        const syllables = {
+            'ba': ['Baju', 'Batu', 'Baca', 'Badak', 'Baru'],
+            'bi': ['Biru', 'Bibir', 'Biola', 'Bisa', 'Biji'],
+            'bu': ['Buku', 'Busa', 'Buka', 'Bulan', 'Bumi'],
+            'be': ['Bebek', 'Becak', 'Beras', 'Belajar', 'Beda'],
+            'bo': ['Bola', 'Botol', 'Boneka', 'Bosan', 'Bolong']
+        };
+
+        const assessmentCriteria = [
+            "Menjawab pertanyaan cerita 'Bola Boni'",
+            "Mengenali bentuk huruf 'B' dan 'b'",
+            "Melafalkan suku kata ba-bi-bu-be-bo",
+            "Berani memperkenalkan diri",
+            "Memegang pensil dengan benar"
+        ];
+
+        // --- STATE ---
+        let currentSlide = 0;
+        let audioContext = null;
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSoundGrid();
+            renderStory();
+            initCharts();
+            renderChecklist();
+            
+            // Init Audio Context on first click for sound effects
+            document.body.addEventListener('click', () => {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }, { once: true });
+        });
+
+        // --- AUDIO ENGINE (TTS & CLICK) ---
+        
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                // Cancel existing speech
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID'; // Bahasa Indonesia
+                utterance.rate = 0.9; // Slightly slower for kids
+                utterance.pitch = 1.1; // Cheerful pitch
+                
+                // Fallback to generic if ID not available
+                const voices = window.speechSynthesis.getVoices();
+                // Simple check doesn't block logic, browser handles fallback best effort
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.log("TTS not supported");
+            }
+        }
+
+        // Simple generated 'pop' sound using Web Audio API (No files needed)
+        function playClick() {
+            if (!audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.1);
+
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+
+        // --- NAVIGATION LOGIC ---
+        function switchMode(mode) {
+            const studentZone = document.getElementById('student-zone');
+            const teacherZone = document.getElementById('teacher-zone');
+            const btnStudent = document.getElementById('btn-student');
+            const btnTeacher = document.getElementById('btn-teacher');
+
+            if (mode === 'student') {
+                studentZone.classList.remove('hidden');
+                teacherZone.classList.add('hidden');
+                btnStudent.classList.replace('bg-gray-200', 'bg-blue-500');
+                btnStudent.classList.replace('text-gray-600', 'text-white');
+                btnTeacher.classList.replace('bg-orange-500', 'bg-gray-200');
+                btnTeacher.classList.replace('text-white', 'text-gray-600');
+            } else {
+                studentZone.classList.add('hidden');
+                teacherZone.classList.remove('hidden');
+                btnStudent.classList.replace('bg-blue-500', 'bg-gray-200');
+                btnStudent.classList.replace('text-white', 'text-gray-600');
+                btnTeacher.classList.replace('bg-gray-200', 'bg-orange-500');
+                btnTeacher.classList.replace('text-gray-600', 'text-white');
+            }
+            window.scrollTo(0, 0);
+        }
+
+        // --- ACTIVITY 1: SOUNDS ---
+        function renderSoundGrid() {
+            const grid = document.getElementById('sound-grid');
+            grid.innerHTML = sounds.map(item => `
+                <div onclick="playClick(); revealSound(this, '${item.name}', '${item.sound}')" class="bg-white p-4 rounded-xl shadow cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 text-center border-b-4 border-orange-200 group h-32 flex flex-col items-center justify-center">
+                    <div class="text-4xl mb-2 group-hover:scale-110 transition">${item.icon}</div>
+                    <div class="font-bold text-gray-700">${item.name}</div>
+                    <div class="sound-reveal hidden mt-2 text-orange-600 font-black text-lg animate-bounce">${item.sound}</div>
+                    <div class="tap-hint text-xs text-gray-300 mt-1">(Klik aku!)</div>
+                </div>
+            `).join('');
+        }
+
+        function revealSound(element, name, soundText) {
+            // Visual
+            document.querySelectorAll('.sound-reveal').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tap-hint').forEach(el => el.classList.remove('hidden'));
+            const reveal = element.querySelector('.sound-reveal');
+            const hint = element.querySelector('.tap-hint');
+            reveal.classList.remove('hidden');
+            hint.classList.add('hidden');
+
+            // Audio
+            const sentence = `${name}. . . ${soundText}`;
+            speak(sentence);
+        }
+
+        // --- ACTIVITY 2: STORY ---
+        function renderStory() {
+            const content = document.getElementById('story-content');
+            const pageNum = document.getElementById('page-num');
+            const slide = storySlides[currentSlide];
+
+            content.innerHTML = `
+                <div class="text-6xl mb-6 animate-pulse">${slide.emoji}</div>
+                <p class="text-2xl md:text-3xl text-gray-800 leading-relaxed font-comic">
+                    ${slide.text}
+                </p>
+            `;
+            pageNum.textContent = currentSlide + 1;
+        }
+
+        function readCurrentStory() {
+            playClick();
+            const slide = storySlides[currentSlide];
+            speak(slide.spoken);
+        }
+
+        function nextSlide() {
+            if (currentSlide < storySlides.length - 1) {
+                currentSlide++;
+                renderStory();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                renderStory();
+            }
+        }
+
+        // --- ACTIVITY 3: SYLLABLES ---
+        function showSyllable(syl) {
+            const display = document.getElementById('syllable-display');
+            const words = syllables[syl];
+            
+            // Audio Logic
+            const wordListString = words.join(", ");
+            const speechText = `${syl}. . . Contoh katanya . . ${wordListString}`;
+            speak(speechText);
+
+            // Visual Logic
+            const wordBadges = words.map(w => 
+                `<span class="inline-block bg-${getSyllableColor(syl)}-100 text-${getSyllableColor(syl)}-700 px-3 py-1 rounded-full text-lg m-1 border border-${getSyllableColor(syl)}-300 transform transition hover:scale-110 cursor-default">${w}</span>`
+            ).join('');
+
+            display.innerHTML = `
+                <div class="text-6xl font-black text-${getSyllableColor(syl)}-600 mb-2 animate-bounce">${syl.toUpperCase()}</div>
+                <div class="text-gray-500 mb-4 text-sm">dibaca "<strong>${syl}</strong>"</div>
+                <div class="flex flex-wrap justify-center gap-2">
+                    ${wordBadges}
+                </div>
+            `;
+        }
+
+        function getSyllableColor(syl) {
+            const colors = { 'ba': 'red', 'bi': 'blue', 'bu': 'green', 'be': 'yellow', 'bo': 'purple' };
+            return colors[syl] || 'gray';
+        }
+
+        // --- ACTIVITY 4: NAME TAG ---
+        function generateCard() {
+            const name = document.getElementById('input-name').value;
+            const hobby = document.getElementById('input-hobby').value;
+            const card = document.getElementById('id-card');
+            const placeholder = document.getElementById('card-placeholder');
+            const nameDisplay = document.getElementById('card-name-display');
+            const hobbyDisplay = document.getElementById('card-hobby-display');
+
+            if(name.trim() === "") {
+                speak("Tolong isi nama dulu ya!");
+                alert("Isi nama dulu ya!"); 
+                return;
+            }
+
+            nameDisplay.textContent = name;
+            hobbyDisplay.textContent = hobby || "...";
+
+            placeholder.classList.add('hidden');
+            card.classList.remove('hidden');
+
+            speak(`Halo, nama saya ${name}. Salam kenal!`);
+        }
+        
+        function speakCard() {
+            const name = document.getElementById('card-name-display').textContent;
+            const hobby = document.getElementById('card-hobby-display').textContent;
+            playClick();
+            speak(`Ini kartu nama ${name}. Hobi saya ${hobby}.`);
+        }
+
+        // --- TEACHER ZONE: CHARTS ---
+        function initCharts() {
+            // Radar Chart: Competency Focus
+            const ctxComp = document.getElementById('competencyChart').getContext('2d');
+            new Chart(ctxComp, {
+                type: 'radar',
+                data: {
+                    labels: ['Menyimak (Listening)', 'Membaca (Reading)', 'Berbicara (Speaking)', 'Menulis (Writing)'],
+                    datasets: [{
+                        label: 'Intensitas Materi Bab 1',
+                        data: [90, 85, 60, 50], // Based on the content volume in the source report
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { display: false } // clean look
+                        }
+                    }
+                }
+            });
+
+            // Doughnut Chart: Assessment Target
+            const ctxAssess = document.getElementById('assessmentChart').getContext('2d');
+            new Chart(ctxAssess, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sudah Bisa (Mandiri)', 'Perlu Bimbingan'],
+                    datasets: [{
+                        data: [70, 30], // Target distribution
+                        backgroundColor: ['#22c55e', '#f97316'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        // --- TEACHER ZONE: CHECKLIST ---
+        function renderChecklist() {
+            const tbody = document.getElementById('checklist-body');
+            tbody.innerHTML = assessmentCriteria.map((crit, index) => `
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="p-4 font-medium">${index + 1}. ${crit}</td>
+                    <td class="p-4 text-center">
+                        <input type="radio" name="check-${index}" class="w-5 h-5 text-orange-500 focus:ring-orange-400">
+                    </td>
+                    <td class="p-4 text-center">
+                        <input type="radio" name="check-${index}" class="w-5 h-5 text-green-500 focus:ring-green-400">
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function resetChecklist() {
+            const inputs = document.querySelectorAll('input[type="radio"]');
+            inputs.forEach(i => i.checked = false);
+        }
+
+    </script>
+</body>
+</html>
