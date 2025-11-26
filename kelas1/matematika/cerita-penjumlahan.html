@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cerita Penjumlahan Kelas 1 SD</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Font & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Comic Neue', cursive;
+            background-color: #fff7ed; /* Orange-ish white */
+            background-image: radial-gradient(#fdba74 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+        
+        .font-title { font-family: 'Fredoka', sans-serif; }
+
+        /* Input Styles mimicking the worksheet */
+        .math-input {
+            border: 3px solid #f97316;
+            border-radius: 12px;
+            text-align: center;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2rem;
+            color: #c2410c;
+            width: 80px;
+            height: 60px;
+            transition: all 0.3s;
+            background: white;
+        }
+        .math-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.3);
+            transform: scale(1.05);
+        }
+        .math-input.correct {
+            border-color: #22c55e;
+            background-color: #f0fdf4;
+            color: #15803d;
+        }
+        .math-input.wrong {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .animate-pop { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- ASSETS: ICON COMPONENTS ---
+        const Icons = {
+            Pencil: ({ color }) => (
+                <svg viewBox="0 0 100 100" className="w-12 h-12 drop-shadow-sm inline-block m-1">
+                    <path d="M30 80 L50 100 L70 80 L70 20 Q 70 10 60 10 L40 10 Q 30 10 30 20 Z" fill={color} />
+                    <path d="M30 80 L50 100 L70 80" fill="#fcd34d" />
+                    <path d="M45 95 L50 100 L55 95" fill="#333" />
+                    <rect x="30" y="10" width="40" height="10" fill="#9ca3af" />
+                    <path d="M30 10 Q 30 0 40 0 L60 0 Q 70 0 70 10" fill="#f87171" />
+                </svg>
+            ),
+            Balloon: ({ color }) => (
+                <svg viewBox="0 0 100 100" className="w-12 h-12 drop-shadow-sm inline-block m-1">
+                    <line x1="50" y1="80" x2="50" y2="100" stroke="#9ca3af" strokeWidth="2" />
+                    <ellipse cx="50" cy="45" rx="35" ry="40" fill={color} />
+                    <ellipse cx="35" cy="30" rx="8" ry="12" fill="rgba(255,255,255,0.3)" transform="rotate(-30 35 30)" />
+                    <polygon points="50,85 45,90 55,90" fill={color} />
+                </svg>
+            ),
+            Cookie: ({ color }) => (
+                <svg viewBox="0 0 100 100" className="w-12 h-12 drop-shadow-sm inline-block m-1">
+                    <circle cx="50" cy="50" r="40" fill={color} />
+                    <circle cx="30" cy="40" r="5" fill="rgba(0,0,0,0.2)" />
+                    <circle cx="70" cy="30" r="5" fill="rgba(0,0,0,0.2)" />
+                    <circle cx="50" cy="70" r="5" fill="rgba(0,0,0,0.2)" />
+                    <circle cx="25" cy="65" r="5" fill="rgba(0,0,0,0.2)" />
+                    <circle cx="75" cy="60" r="5" fill="rgba(0,0,0,0.2)" />
+                </svg>
+            ),
+            Car: ({ color }) => (
+                <svg viewBox="0 0 100 60" className="w-12 h-12 drop-shadow-sm inline-block m-1">
+                    <path d="M10 35 L20 15 L75 15 L85 35 L90 35 Q 95 35 95 45 L95 50 L5 50 L5 45 Q 5 35 10 35 Z" fill={color} />
+                    <circle cx="25" cy="50" r="8" fill="#333" />
+                    <circle cx="75" cy="50" r="8" fill="#333" />
+                </svg>
+            ),
+            Cat: ({ color }) => (
+                <svg viewBox="0 0 100 100" className="w-12 h-12 drop-shadow-sm inline-block m-1">
+                    <circle cx="50" cy="60" r="30" fill={color} />
+                    <polygon points="25,40 20,10 45,35" fill={color} />
+                    <polygon points="75,40 80,10 55,35" fill={color} />
+                    <circle cx="40" cy="55" r="3" fill="#333" />
+                    <circle cx="60" cy="55" r="3" fill="#333" />
+                    <path d="M45 65 Q 50 70 55 65" stroke="#333" strokeWidth="2" fill="none"/>
+                </svg>
+            ),
+            Apple: ({ color }) => (
+                <svg viewBox="0 0 100 100" className="w-12 h-12 drop-shadow-sm inline-block m-1">
+                    <path d="M50 20 Q 65 5 80 20 Q 95 35 85 65 Q 75 95 50 90 Q 25 95 15 65 Q 5 35 20 20 Q 35 5 50 20" fill={color} />
+                    <path d="M50 20 Q 50 5 55 10" stroke="#4a7c59" strokeWidth="4" fill="none" />
+                </svg>
+            ),
+            Book: ({ color }) => (
+                <svg viewBox="0 0 100 100" className="w-12 h-12 drop-shadow-sm inline-block m-1">
+                    <rect x="15" y="20" width="70" height="60" rx="5" fill={color} />
+                    <rect x="20" y="25" width="60" height="50" fill="white" opacity="0.3" />
+                    <line x1="10" y1="20" x2="10" y2="80" stroke="#333" strokeWidth="4" />
+                </svg>
+            ),
+            Flower: ({ color }) => (
+                <svg viewBox="0 0 100 100" className="w-12 h-12 drop-shadow-sm inline-block m-1">
+                    <circle cx="30" cy="30" r="15" fill={color} />
+                    <circle cx="70" cy="30" r="15" fill={color} />
+                    <circle cx="30" cy="70" r="15" fill={color} />
+                    <circle cx="70" cy="70" r="15" fill={color} />
+                    <circle cx="50" cy="50" r="20" fill="#facc15" />
+                </svg>
+            ),
+            Ball: ({ color }) => (
+                <svg viewBox="0 0 100 100" className="w-12 h-12 drop-shadow-sm inline-block m-1">
+                    <circle cx="50" cy="50" r="40" fill={color} stroke="#333" strokeWidth="1"/>
+                    <path d="M10 50 Q 50 20 90 50" fill="none" stroke="white" strokeWidth="3" />
+                </svg>
+            ),
+            Bird: ({ color }) => (
+                <svg viewBox="0 0 100 100" className="w-12 h-12 drop-shadow-sm inline-block m-1">
+                    <path d="M20 60 Q 20 30 50 30 Q 80 30 80 60 Q 80 90 50 90 Q 20 90 20 60" fill={color} />
+                    <polygon points="80,45 95,50 80,55" fill="#facc15" />
+                    <circle cx="65" cy="45" r="4" fill="black" />
+                    <path d="M20 60 Q 10 50 10 70" stroke={color} strokeWidth="5" fill="none" />
+                </svg>
+            )
+        };
+
+        // --- HELPER: TTS ---
+        const speak = (text) => {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID';
+                window.speechSynthesis.speak(utterance);
+            }
+        };
+
+        // --- DATA GENERATOR ---
+        const NAMES = ["Budi", "Siti", "Ani", "Edo", "Dayu", "Lani", "Beni", "Udin", "Meli", "Ayah", "Ibu", "Paman"];
+        
+        const OBJECTS = [
+            { key: 'Pencil', name: 'pensil' },
+            { key: 'Balloon', name: 'balon' },
+            { key: 'Cookie', name: 'kue' },
+            { key: 'Car', name: 'mobil mainan' },
+            { key: 'Cat', name: 'kucing' },
+            { key: 'Apple', name: 'apel' },
+            { key: 'Book', name: 'buku' },
+            { key: 'Flower', name: 'bunga' },
+            { key: 'Ball', name: 'bola' },
+            { key: 'Bird', name: 'burung' }
+        ];
+
+        const COLORS = [
+            { hex: "#ef4444", name: "merah" },
+            { hex: "#3b82f6", name: "biru" },
+            { hex: "#22c55e", name: "hijau" },
+            { hex: "#eab308", name: "kuning" },
+            { hex: "#a855f7", name: "ungu" },
+            { hex: "#f97316", name: "oranye" },
+            { hex: "#ec4899", name: "merah muda" },
+            { hex: "#06b6d4", name: "biru muda" }
+        ];
+
+        const ACTIONS_START = ["mempunyai", "memiliki", "membawa", "memegang", "membeli", "melihat"];
+        const ACTIONS_ADD = ["diberi lagi", "membeli lagi", "menemukan", "mengambil lagi", "datang lagi"];
+
+        const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        
+        const generateQuestions = (count = 10) => {
+            let questions = [];
+            for (let i = 0; i < count; i++) {
+                const name = getRandomItem(NAMES);
+                const object = getRandomItem(OBJECTS);
+                
+                // Random count (sum <= 10)
+                const count1 = Math.floor(Math.random() * 5) + 1; // 1-5
+                const count2 = Math.floor(Math.random() * 5) + 1; // 1-5
+                
+                // Random colors (ensure they are different)
+                const color1 = getRandomItem(COLORS);
+                let color2 = getRandomItem(COLORS);
+                while(color1.name === color2.name) {
+                    color2 = getRandomItem(COLORS);
+                }
+
+                // Random verbs
+                const verb1 = getRandomItem(ACTIONS_START);
+                const verb2 = getRandomItem(ACTIONS_ADD);
+
+                // Build phrases
+                const text1 = `${name} ${verb1}`;
+                const label1 = `${object.name} ${color1.name}`;
+                
+                const text2 = `Lalu ${verb2}`; 
+                const label2 = `${object.name} ${color2.name}`;
+
+                const question = `Berapa jumlah semua ${object.name} ${name}?`;
+                const conclusion = `${name} memiliki ___ ${object.name}.`;
+
+                questions.push({
+                    id: i + 1,
+                    icon: object.key,
+                    objectName: object.name,
+                    text1, count1, label1, color1: color1.hex,
+                    text2, count2, label2, color2: color2.hex,
+                    question,
+                    conclusion
+                });
+            }
+            return questions;
+        };
+
+        // --- FOOTER COMPONENT ---
+        const Footer = () => (
+            <footer className="mt-10 pb-6 text-center">
+                <p className="text-gray-600 font-title text-sm md:text-base">
+                    Dibuat oleh <span className="font-bold text-orange-600">Abdul Salim Owner folderosn.com</span>
+                </p>
+                <a href="https://pakabdulsalim.blogspot.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 font-bold text-sm md:text-base hover:underline">
+                    Kunjungi: https://pakabdulsalim.blogspot.com
+                </a>
+            </footer>
+        );
+
+        const App = () => {
+            const [questions, setQuestions] = useState([]);
+            const [idx, setIdx] = useState(0);
+            const [val1, setVal1] = useState('');
+            const [val2, setVal2] = useState('');
+            const [res, setRes] = useState('');
+            const [status, setStatus] = useState('loading'); // loading, playing, correct, finished
+            
+            // Initialize questions
+            useEffect(() => {
+                startNewGame();
+            }, []);
+
+            const startNewGame = () => {
+                const newQuestions = generateQuestions(10);
+                setQuestions(newQuestions);
+                setIdx(0);
+                setStatus('playing');
+                setVal1(''); setVal2(''); setRes('');
+            };
+
+            const q = questions[idx];
+            
+            // Sound effect for TTS
+            useEffect(() => {
+                if(status === 'playing' && q) {
+                    setVal1(''); setVal2(''); setRes('');
+                    const fullText = `${q.id}. ${q.text1} ${q.count1} ${q.label1}. ${q.text2} ${q.count2} ${q.label2}. ${q.question}`;
+                    speak(fullText);
+                }
+            }, [idx, status, q]);
+
+            const checkAnswer = () => {
+                const n1 = parseInt(val1);
+                const n2 = parseInt(val2);
+                const r = parseInt(res);
+
+                if (n1 === q.count1 && n2 === q.count2 && r === (q.count1 + q.count2)) {
+                    setStatus('correct');
+                    speak("Luar biasa! Jawabanmu benar.");
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                } else {
+                    speak("Coba lagi ya. Perhatikan angkanya.");
+                }
+            };
+
+            const nextQuestion = () => {
+                if (idx < questions.length - 1) {
+                    setIdx(idx + 1);
+                    setStatus('playing');
+                } else {
+                    setStatus('finished');
+                    speak("Selamat! Kamu sudah menyelesaikan semua soal cerita.");
+                }
+            };
+
+            const renderIcon = (name, color, count) => {
+                const Comp = Icons[name];
+                return (
+                    <div className="flex flex-wrap gap-1 justify-center max-w-[200px]">
+                        {[...Array(count)].map((_, i) => (
+                            <div key={i} className="animate-pop" style={{animationDelay: `${i * 0.1}s`}}>
+                                <Comp color={color} />
+                            </div>
+                        ))}
+                    </div>
+                );
+            };
+
+            if (status === 'loading') return <div className="min-h-screen flex items-center justify-center text-2xl text-orange-500 font-bold">Memuat Soal...</div>;
+
+            // --- SCREEN: FINISHED ---
+            if (status === 'finished') {
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-orange-50 text-center">
+                        <div className="flex-grow flex flex-col items-center justify-center w-full">
+                            <div className="text-8xl mb-4 animate-bounce">🌟</div>
+                            <h1 className="font-title text-4xl text-orange-600 mb-4">Hebat Sekali!</h1>
+                            <p className="text-xl mb-8">Kamu sudah menyelesaikan 10 soal cerita.</p>
+                            <button 
+                                onClick={startNewGame}
+                                className="bg-green-500 text-white px-8 py-3 rounded-full font-bold shadow-lg text-xl hover:scale-105 transition"
+                            >
+                                Mulai Lagi (Soal Baru)
+                            </button>
+                        </div>
+                        <Footer />
+                    </div>
+                );
+            }
+
+            // --- SCREEN: PLAYING ---
+            return (
+                <div className="min-h-screen flex flex-col items-center py-8 px-4 max-w-3xl mx-auto">
+                    
+                    {/* Header / Progress */}
+                    <div className="w-full flex justify-between items-center mb-6">
+                        <h1 className="font-title text-2xl text-orange-600">Cerita Matematika</h1>
+                        <div className="bg-white px-4 py-1 rounded-full border-2 border-orange-200 text-orange-500 font-bold">
+                            Soal {idx + 1} / {questions.length}
+                        </div>
+                    </div>
+
+                    {/* Story Card */}
+                    <div className="bg-white rounded-3xl shadow-xl border-b-8 border-orange-200 w-full p-6 md:p-10 relative">
+                        
+                        {/* Replay Sound */}
+                        <button 
+                            onClick={() => speak(`${q.text1} ${q.count1} ${q.label1}. ${q.text2} ${q.count2} ${q.label2}. ${q.question}`)}
+                            className="absolute top-4 right-4 bg-blue-100 text-blue-500 p-3 rounded-full hover:bg-blue-200 transition"
+                        >
+                            <i className="fa-solid fa-volume-high text-xl"></i>
+                        </button>
+
+                        {/* Story Text & Visuals */}
+                        <div className="space-y-6 mb-8">
+                            
+                            {/* Line 1 */}
+                            <div className="flex flex-col md:flex-row items-center gap-4 bg-orange-50 p-4 rounded-2xl border border-orange-100">
+                                <div className="flex-1 text-lg md:text-2xl text-gray-700 text-center md:text-left">
+                                    <span className="font-bold text-orange-600 mr-2">1.</span> 
+                                    {q.text1} <span className="font-bold text-red-500 text-3xl mx-1">{q.count1}</span> {q.label1}.
+                                </div>
+                                {renderIcon(q.icon, q.color1, q.count1)}
+                            </div>
+
+                            {/* Line 2 */}
+                            <div className="flex flex-col md:flex-row items-center gap-4 bg-green-50 p-4 rounded-2xl border border-green-100">
+                                <div className="flex-1 text-lg md:text-2xl text-gray-700 text-center md:text-left">
+                                    <span className="font-bold text-green-600 mr-2">2.</span> 
+                                    {q.text2} <span className="font-bold text-green-600 text-3xl mx-1">{q.count2}</span> {q.label2}.
+                                </div>
+                                {renderIcon(q.icon, q.color2, q.count2)}
+                            </div>
+
+                            {/* Question */}
+                            <div className="text-center text-xl md:text-2xl font-bold text-gray-800 mt-4">
+                                {q.question}
+                            </div>
+                        </div>
+
+                        {/* Interaction Area: Equation */}
+                        <div className="bg-blue-50 rounded-2xl p-6 border-2 border-blue-100">
+                            <p className="text-center text-gray-500 mb-4 font-bold">Penyelesaian:</p>
+                            
+                            <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 mb-6">
+                                {/* Input 1 */}
+                                <input 
+                                    type="number" 
+                                    value={val1}
+                                    onChange={(e) => setVal1(e.target.value)}
+                                    className={`math-input ${status === 'correct' ? 'correct' : ''}`}
+                                    disabled={status === 'correct'}
+                                    placeholder="..."
+                                />
+                                
+                                <span className="text-4xl font-black text-gray-400">+</span>
+                                
+                                {/* Input 2 */}
+                                <input 
+                                    type="number" 
+                                    value={val2}
+                                    onChange={(e) => setVal2(e.target.value)}
+                                    className={`math-input ${status === 'correct' ? 'correct' : ''}`}
+                                    disabled={status === 'correct'}
+                                    placeholder="..."
+                                />
+                                
+                                <span className="text-4xl font-black text-gray-400">=</span>
+                                
+                                {/* Result */}
+                                <input 
+                                    type="number" 
+                                    value={res}
+                                    onChange={(e) => setRes(e.target.value)}
+                                    className={`math-input ${status === 'correct' ? 'correct' : ''}`}
+                                    disabled={status === 'correct'}
+                                    placeholder="..."
+                                />
+                            </div>
+
+                            {/* Conclusion Sentence */}
+                            <div className="text-center text-lg md:text-2xl text-gray-700 bg-white p-3 rounded-xl inline-block w-full border border-gray-200">
+                                {q.conclusion.split("___")[0]} 
+                                <span className={`inline-block border-b-4 px-2 font-bold min-w-[50px] text-center ${status === 'correct' ? 'text-green-600 border-green-500' : 'text-transparent border-gray-300'}`}>
+                                    {status === 'correct' ? res : '?'}
+                                </span>
+                                {q.conclusion.split("___")[1]}
+                            </div>
+                        </div>
+
+                        {/* Action Button */}
+                        <div className="mt-8 text-center h-16">
+                            {status === 'playing' ? (
+                                <button 
+                                    onClick={checkAnswer}
+                                    className="bg-orange-500 hover:bg-orange-600 text-white text-xl font-bold py-3 px-10 rounded-full shadow-lg transform transition active:scale-95 border-b-4 border-orange-700"
+                                >
+                                    Cek Jawaban
+                                </button>
+                            ) : (
+                                <button 
+                                    onClick={nextQuestion}
+                                    className="bg-green-500 hover:bg-green-600 text-white text-xl font-bold py-3 px-10 rounded-full shadow-lg transform transition hover:scale-105 animate-bounce border-b-4 border-green-700"
+                                >
+                                    Lanjut Soal Berikutnya <i className="fa-solid fa-arrow-right ml-2"></i>
+                                </button>
+                            )}
+                        </div>
+
+                    </div>
+                    
+                    <Footer />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
